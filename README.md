@@ -10,3 +10,5 @@
 7. Simple Linear Regression
 8. Model Validation
 9. Conclusion
+
+### 1. Intro
