@@ -74,7 +74,7 @@ That's the nature of baseball: Runs Scored and Runs Allowed. In this project, I'
 - **RS** Skewness: 0.35264844525853095
 - **RS** Kurtosis: 0.061150254394042314
 
-According to the histogram and probability plot above, **RS** seems to follow a normal distribution. The skewness of 0.35 and kurtosis of 0.06 also indicate that team **RS** data is normallly distributed. The boxplots above also show that team **RS** has been normally distributed over the last 10 seasons with few outliers.
+According to the histogram and probability plot above, **RS** seems to follow a normal distribution. The skewness of 0.35 and kurtosis of 0.06 also indicate that team **RS** data is normallly distributed. Likewise, the boxplots above show that team **RS** has been normally distributed over the last 10 seasons with few outliers.
 
 
 ***4-2. Correlation EDA***
@@ -103,18 +103,18 @@ Scatter plots also depict that there are reasonable linear trends between each i
 ### 5. Feature Scaling
 Since the ranges of independent variables considerably vary, I scaled all the independet variables. As all the data attributes have normal distributions with few outliers, I used ***StandardScaler*** to scale them.
 
-The result of feature sacling is the following:
+The result of feature scaling is the following:
 
 <img src="https://user-images.githubusercontent.com/67542497/105629054-1bcc4d00-5e84-11eb-934a-c7efe9d98fbc.png" width="600" height="600">
 
 
 ### 6. Multiple Linear Regression with Feature Selection
-I included all the independent variables in an initial multiple linear regression model to identify multicollinearity. After building this model, I also created a variance inflation factor (VIF) data frame and the result is following:
+I included all the independent variables in an initial multiple linear regression model to identify multicollinearity. After building this model, I also created a Variance Inflation Factor (VIF) data frame and the result is following:
 
 <img width="207" alt="VIF" src="https://user-images.githubusercontent.com/67542497/105631676-f8f56500-5e92-11eb-9959-70ddbd1644fb.png">
 
-According to the table above, there is very strong multicollinearity in our model because the independent variables are highly corrleated one another.
-Therefore, I used a stepwise feature selection method until I got the best couple of data features.
+According to the table above, there is very strong multicollinearity in the model because independent variables are highly corrleated one another.
+Therefore, I used a stepwise feature selection method until I got the best couple of data attributes.
 
 After repeating feature-inclusion/exclusion process based on VIF and correlations with RS, I got **OBP** and **ISO** as the independent variables in our multiple linear regression model.
 >> The result of the model is:
