@@ -95,7 +95,7 @@ As a result, 11 data features are selected indicated in the correlation heatmap 
 According to the histograms of each independent variable above, all the variables are normally distributed.
 
 <img src="https://user-images.githubusercontent.com/67542497/105629057-1cfd7a00-5e84-11eb-8ea9-ed824baf24aa.png" width="600" height="600">
-Scatter plots also depicts that there are reasonable linear trends between each independent variable and **RS** without notable outliers, and thus, it's safe to use the linear regression model.
+Scatter plots also depict that there are reasonable linear trends between each independent variable and **RS** without notable outliers, and thus, it's safe to use the linear regression model.
 
 ### 5. Feature Scaling
 Since the data ranges of independent variables considerably vary, we need to scale them. As all the data attributes have normal distributions with few outliers, we're going to use ***StandardScaler*** to scale our data.
