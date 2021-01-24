@@ -22,6 +22,7 @@ Okay, now we understand that we should focus on wins, then HOW do we win? (i.e. 
 Alright, we're almost there. Your goal is to win and therefore, you shoud outscore your opponents to do so. That's the nature of baseball: Runs Scored and Runs Allowed. In this project, I'll pretty much focus on the first part of baseball, **Runs Scored**.
 
 ### 2. Metadata
+| ----------- | ----------- |
 | **Origin of Data** | [Baseball Prospectus](https://www.baseballprospectus.com) |
 | **Terms of Use** | [Terms and Conditions](https://www.baseballprospectus.com/terms-and-conditions/) |
 | **Data Structure** | 301 * 28 |
