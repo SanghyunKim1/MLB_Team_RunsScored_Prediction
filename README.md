@@ -23,10 +23,10 @@ Alright, we're almost there. Your goal is to win and therefore, you shoud outsco
 
 ### 2. Metadata
 | **Metadata** | **Information** |
-| ----------- | ----------- |
+| :-----------: | :-----------: |
 | **Origin of Data** | [Baseball Prospectus](https://www.baseballprospectus.com) |
 | **Terms of Use** | [Terms and Conditions](https://www.baseballprospectus.com/terms-and-conditions/) |
-| **Data Structure** | 301 * 28 |
+| **Data Structure** | 301 rows * 28 columns |
 | **Data Meaning** |  |
 
 ### 3. Data Cleaning
