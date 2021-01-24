@@ -108,7 +108,7 @@ corr = batting_df.corr()
 fig, ax = plt.subplots(figsize=(8, 8))
 
 sns.heatmap(corr, square=True)
-plt.title('Batting Statistics Correlation with RS')
+plt.title('Correlation Matrix')
 
 plt.show()
 
@@ -131,6 +131,7 @@ fig, ax = plt.subplots(figsize=(10, 10))
 corr = batting_df.corr()
 sns.heatmap(corr, square=True, annot=True, annot_kws={'size':10},
             xticklabels=corr.columns, yticklabels=corr.columns)
+plt.title('Correlation Matrix')
 
 plt.show()
 
