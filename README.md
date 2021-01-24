@@ -173,7 +173,7 @@ First, **OBP** (On-Base Percentage) measures how many times a batter reaches bas
 
 Second, **ISO** measures the raw power of a batter. It's calculated as the difference between *BA(Batting Averages)* and *SLG*. For simplicity, it measures how often a batter advances runners on bases (i.e. **extra-base hits**).
 
-Finally, **OPS** is the sum of **OBP** and **SLG**. **SLG** here refers to *Slugging Percentage*. This **SLG** shows the total number of bases (*single*+*extra-base hits*) a hitter records per at-bat. As it doesn't include *Base-on-Balls* and *Hit-by-Pitches*, if we combine **OBP** and **SLG** together, we get a single statistic that measures similar things that **OBP + ISO** do.
+Finally, **OPS** is the sum of **OBP** and **SLG**. **SLG** here refers to *Slugging Percentage*. This **SLG** shows the total number of bases (*single*+*extra-base hits*) a hitter records per at-bat. As it doesn't include *Base-on-Balls* and *Hit-by-Pitches*, if we combine **OBP** and **SLG** together, we get a single statistic that measures similar things that **OBP + ISO** does.
 
 The nature of baseball again. As I mentioned at the beginning of this project, a team should outscore its opponents to win a game in baseball. To do so, that team has to score and it's indicated as **Runs Scored (RS)**, the dependent variable. Then how does a team score runs?
 
