@@ -26,7 +26,7 @@ Alright, we're almost there. Your goal is to win and therefore, you shoud outsco
 | :-----------: | :-----------: |
 | **Origin of Data** | [Baseball Prospectus](https://www.baseballprospectus.com) |
 | **Terms of Use** | [Terms and Conditions](https://www.baseballprospectus.com/terms-and-conditions/) |
-| **Data Structure** | 301 rows * 28 columns |
+| **Data Structure** | 10 datasets each consisting of 301 rows * 28 columns |
 
 | **Data Meaning** | **Explanation** |
 | :-----------: | :-----------: |
@@ -59,7 +59,9 @@ Alright, we're almost there. Your goal is to win and therefore, you shoud outsco
 | ***BWARP*** | [Batter Wins Above Replacement Player](https://legacy.baseballprospectus.com/glossary/index.php?mode=viewstat&stat=591) |
 
 ### 3. Data Cleaning
-
+- Combined 10 different datasets (2010-2019 Season Batting datasets)
+- Dropped an unnecessary column made when combining datasets (Column: '#')
+- Eliminated commas in some data features and convert their data types from **integer** into **numeric** ('PA', 'AB', 'H', 'SO')
 
 ### 4. EDA (Exploratory Data Analysis)
 
