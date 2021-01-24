@@ -27,9 +27,9 @@ That's the nature of baseball: Runs Scored and Runs Allowed. In this project, I'
 | :-----------: | :-----------: |
 | **Origin of Data** | [Baseball Prospectus](https://www.baseballprospectus.com) |
 | **Terms of Use** | [Terms and Conditions](https://www.baseballprospectus.com/terms-and-conditions/) |
-| **Data Structure** | 10 datasets each consisting of 301 rows * 28 columns |
+| **Data Structure** | 10 datasets each consisting of 31 rows * 28 columns |
 
-| **Data Meaning** | **Explanation** |
+| **Data Feature** | **Data Meaning** |
 | :-----------: | :-----------: |
 | ***LG*** | AL: American League / NL: National League |
 | ***YEAR*** | Each year refers to corresponding seasons |
@@ -92,9 +92,11 @@ As a result, 11 data features are selected indicated in the correlation heatmap 
 ***4-3. Filtered Independent Variables EDA***
 
 <img src="https://user-images.githubusercontent.com/67542497/105629048-17a02f80-5e84-11eb-977a-7d2a5dc43438.png" width="800" height="800">
+
 According to the histograms of each independent variable above, all the variables are normally distributed.
 
 <img src="https://user-images.githubusercontent.com/67542497/105629057-1cfd7a00-5e84-11eb-8ea9-ed824baf24aa.png" width="600" height="600">
+
 Scatter plots also depict that there are reasonable linear trends between each independent variable and **RS** without notable outliers, and thus, it's safe to use the linear regression model.
 
 ### 5. Feature Scaling
@@ -106,9 +108,36 @@ The result of feature sacling is the following:
 
 
 ### 6. Multiple Linear Regression with Feature Selection
+I included all the independent variables in an initial multiple linear regression model to identify multicollinearity. After building this model, I also created a variance inflation factor (VIF) data frame and the result is following:
+
+<img width="207" alt="VIF" src="https://user-images.githubusercontent.com/67542497/105631676-f8f56500-5e92-11eb-9959-70ddbd1644fb.png">
+
+According to the table above, there is very strong multicollinearity in our model because the independent variables are highly corrleated one another.
+Therefore, I used a stepwise feature selection method until I got the best couple of data features.
+
+After repeating feature-inclusion/exclusion process based on VIF and correlations with RS, I got **OBP** and **ISO** as the independent variables in our multiple linear regression model.
+>> The result of the model is:
+
+>> <img width="601" alt="Multiple Linear Regression" src="https://user-images.githubusercontent.com/67542497/105631900-1a0a8580-5e94-11eb-85fa-8b68b3bb492f.png">
+>> <img width="193" alt="VIF2" src="https://user-images.githubusercontent.com/67542497/105631903-1c6cdf80-5e94-11eb-9025-2c86950abd0e.png">
 
 
 ### 7. Simple Linear Regression
+As our goal is to build a model that has the least possible number of independent variables with as high accuracy as possible when building a regression model, I also conducted a simple linear regression model.
+
+Based on the correlations between all the independent variables and **RS**, I chose **OPS**, of which correlation with **RS** is about 0.95, as the independent variable in this simple linear regression model.
+
+Furthermore, I also splitted data into training(70%) and test(30%) data for accuracy.
+
+The result of the model is:
+
+| **Measurement** | **Score** | 
+| :-----------: | :-----------: |
+| ***Intercept*** | -743.6951063742002 |
+| ***Coefficient*** | 1998.01555622 |
+| ***R-squared*** | 0.9089167630414022 |
+| ***RMSE*** | 21.648415497233565 |
+
 
 
 ### 8. Model Validation
