@@ -167,7 +167,7 @@ However, the differences in the R-squared between those two models are marginal,
 
 Comparing those two models, although the simple linear regression model has the higher R-squared, the differences between these two models seem margianl.
 
-One possible reason for such as result is because these two predictors (**OPS** vs **OPB**+**ISO**) measure similar things in baseball. For those who are not familiar with baseball, let me briefly talk about what these three stats measure in baeball.
+One possible reason for such a result is because these two predictors (**OPS** vs **OPB**+**ISO**) measure similar things in baseball. For those who are not familiar with baseball, let me briefly talk about what these three stats measure in baeball.
 
 First, **OBP** (On-Base Percentage) measures how many times a batter reaches bases (e.g an **OBP** of 0.400 means that this batter has reached bases four times in 10 plate appearances). It includes *Hits*, *Base-on-Balls* and *Hit-by-Pitches*.
 
