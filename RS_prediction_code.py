@@ -396,7 +396,7 @@ cv_r2 = cross_val_score(model, x, y, scoring='r2', cv=10)
 cv_mse = cross_val_score(model, x, y, scoring='neg_mean_squared_error', cv=10)
 cv_rmse = np.sqrt(-1 * cv_mse)
 
-print('------- Multiple Linear Regression -------')
+print('------- Multiple Linear Regression Validation -------')
 print('Mean R-squared: {}'.format(cv_r2.mean()))
 print('Mean RMSE: {}'.format(cv_rmse.mean()))
 
@@ -409,35 +409,6 @@ cv_r2 = cross_val_score(model, x, y, scoring='r2', cv=10)
 cv_mse = cross_val_score(model, x, y, scoring='neg_mean_squared_error', cv=10)
 cv_rmse = np.sqrt(-1 * cv_mse)
 
-print('------- Simple Linear Regression -------')
+print('------- Simple Linear Regression Validation -------')
 print('Mean R-squared: {}'.format(cv_r2.mean()))
 print('Mean RMSE: {}'.format(cv_rmse.mean()))
-
-
-
-### 7. Conclusion ###
-# The goal of this project is to find the best predictor and to predict a team's runs scored given that predictor.
-#
-# We initially had 24 independent variables with one dependent variable ('RS'). Through the stepwise feature selection process, we ended up only two independent variables ('OBP' and 'ISO') in our multiple linear regression model.
-#
-# On the other hand, we also conducted a simple linear regression model based on those 24 vairables' correlations with 'RS'. As a result, 'OPS' has been selected as the single best predictor as it has the higest correlation with 'RS' (0.950).
-#
-# Comparing these two models, although the simple linear regression model has the higher R-squared and smaller RMSE, the differences between these two models seem margianl.
-#
-# There's one possible reason for such a result. These two predictors ('OPS' vs 'OPB' + 'ISO') measure similar things in baseball. For those who are not familiar with baseball, let me briefly talk about what these three stats measure in baeball.
-#
-# First, the OBP (On-Base Percentage) measures how many times a batter reaches bases (e.g an OBP of 0.400 means that this batter has reached bases four times in 10 plate appearances). It includes 'Hits', 'Base-on-Balls' and 'Hit-by-Pitches'.
-#
-# Second, the ISO measures the raw power of a batter. It's calculated as the difference between BA(Batting Averages) and SLG. For simplicity, it measures how often a batter advances runners on bases (extra-base hits).
-#
-# Finally, the OPS is the sum of OBP and SLG. SLG here refers to Slugging Percentage. This SLG shows the total number of bases (single + extra-base hits) a hitter records per at-bat. As it doesn't include 'Base-on-Balls' and 'Hit-by-Pitches', if we combine OBP and SLG together, we get a single statistic that measures similar things OBP + ISO do.
-#
-# Of course, thers's mathematical flaws in each of these three stats, so there's more advanced baseball statistics but I won't go into details about it.
-#
-# Anyway, the nature of baseball again. As I mentioned at the beginning of this notebook, a team should outscore its opponents to win a game in baseball. To do so, that team has to score and it's indicated as Runs Scored (RS), our dependent variables. Then how does a team score runs?
-#
-# Simple. To score runs in baseball, a team's batters must reach bases (runners on bases) and other batters must advance these runners on bases. This is how a team scores in baseball.
-#
-# And this is what either OPS or OBP + ISO measure, the ability to reach bases as well as advance runners on bases to drive runs.
-#
-# Given this fact, there's no wonder that our two different models yield the similar level of accuracy. Each predictor(s) measures similar things. Therefore, we might have got the similar result. Therefore, although the simple linear regression model where the independent variable is OPS yields a marginally more accurate result, you'd get similar results no matter which one you use and the difference would be marginal in reality.
