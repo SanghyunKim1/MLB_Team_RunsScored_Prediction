@@ -19,16 +19,16 @@ matplotlib_axes_logger.setLevel('ERROR')
 ### Purpose of Work: predicting a team's runs scored based on various batting statistics
 
 # load datasets
-batting_2019 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB_Analysis/Data/Batting/batting_2019.csv')
-batting_2018 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB_Analysis/Data/Batting/batting_2018.csv')
-batting_2017 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB_Analysis/Data/Batting/batting_2017.csv')
-batting_2016 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB_Analysis/Data/Batting/batting_2016.csv')
-batting_2015 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB_Analysis/Data/Batting/batting_2015.csv')
-batting_2014 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB_Analysis/Data/Batting/batting_2014.csv')
-batting_2013 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB_Analysis/Data/Batting/batting_2013.csv')
-batting_2012 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB_Analysis/Data/Batting/batting_2012.csv')
-batting_2011 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB_Analysis/Data/Batting/batting_2011.csv')
-batting_2010 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB_Analysis/Data/Batting/batting_2010.csv')
+batting_2019 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB Analysis/MLB_Team_RunsScored_Prediction/data/batting_2019.csv')
+batting_2018 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB Analysis/MLB_Team_RunsScored_Prediction/data/batting_2018.csv')
+batting_2017 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB Analysis/MLB_Team_RunsScored_Prediction/data/batting_2017.csv')
+batting_2016 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB Analysis/MLB_Team_RunsScored_Prediction/data/batting_2016.csv')
+batting_2015 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB Analysis/MLB_Team_RunsScored_Prediction/data/batting_2015.csv')
+batting_2014 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB Analysis/MLB_Team_RunsScored_Prediction/data/batting_2014.csv')
+batting_2013 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB Analysis/MLB_Team_RunsScored_Prediction/data/batting_2013.csv')
+batting_2012 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB Analysis/MLB_Team_RunsScored_Prediction/data/batting_2012.csv')
+batting_2011 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB Analysis/MLB_Team_RunsScored_Prediction/data/batting_2011.csv')
+batting_2010 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB Analysis/MLB_Team_RunsScored_Prediction/data/batting_2010.csv')
 
 # merge datasets
 batting_dfs = [batting_2019, batting_2018, batting_2017, batting_2016, batting_2015,
