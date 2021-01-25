@@ -101,7 +101,7 @@ Scatter plots also depict that there are reasonable linear trends between each i
 
 
 ### 5. Feature Scaling
-Since the ranges of independent variables considerably vary, I scaled all the independet variables. As all the data attributes have normal distributions with few outliers, I used ***StandardScaler*** to scale them.
+Since the ranges of independent variables vary considerably, I scaled all the independent variables. As all the data attributes have normal distributions with few outliers, I used ***StandardScaler*** to scale them.
 
 The result of feature scaling is the following:
 
@@ -117,10 +117,10 @@ According to the table above, there is very strong multicollinearity in the mode
 Therefore, I used a stepwise feature selection method until I got the best couple of data attributes.
 
 After repeating feature-inclusion/exclusion process based on VIF and correlations with RS, I got **OBP** and **ISO** as the independent variables in our multiple linear regression model.
->> The result of the model is:
+The result of the model is:
 
->> <img width="601" alt="Multiple Linear Regression" src="https://user-images.githubusercontent.com/67542497/105631900-1a0a8580-5e94-11eb-85fa-8b68b3bb492f.png">
->> <img width="193" alt="VIF2" src="https://user-images.githubusercontent.com/67542497/105631903-1c6cdf80-5e94-11eb-9025-2c86950abd0e.png">
+<img width="601" alt="Multiple Linear Regression" src="https://user-images.githubusercontent.com/67542497/105631900-1a0a8580-5e94-11eb-85fa-8b68b3bb492f.png">
+<img width="193" alt="VIF2" src="https://user-images.githubusercontent.com/67542497/105631903-1c6cdf80-5e94-11eb-9025-2c86950abd0e.png">
 
 
 ### 7. Simple Linear Regression
