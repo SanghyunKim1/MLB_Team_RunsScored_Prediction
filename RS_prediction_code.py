@@ -33,7 +33,7 @@ batting_2010 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB 
 # merge datasets
 batting_dfs = [batting_2019, batting_2018, batting_2017, batting_2016, batting_2015,
                batting_2014, batting_2013, batting_2012, batting_2011, batting_2010]
-batting_df = reduce(lambda left, right: pd.merge(left, right, how='outer'), batting_dfs)
+batting_df = reduce(lambda x, y: pd.merge(x, y, how='outer'), batting_dfs)
 print(batting_df.head().to_string())
 
 
@@ -71,17 +71,19 @@ print(batting_df.dtypes)
 
 
 ### 2. EDA (Exploratory Data Analysis) ###
+
+# dependent variable, 'RS' EDA
 print("------- Batting Data Descriptive Summary -------")
 print(batting_df.describe().to_string())
 
-# 'RS' histogram and probability plot
+# 'RS' histogram and Q-Q plot
 fig, axes = plt.subplots(1, 2, figsize=(20, 8))
 
 sns.histplot(batting_df['RS'], kde=True, ax=axes[0])
 axes[0].set_title('Team RS Histogram')
 
 axes[1] = stats.probplot(batting_df['RS'], plot=plt)
-plt.title('Team RS Probability Plot')
+plt.title('Team RS Q-Q Plot')
 
 plt.show()
 
@@ -91,8 +93,6 @@ print('Median RS: {}'.format(batting_df['RS'].median()))
 print('RS Standard Deviation: {}'.format(batting_df['RS'].std()))
 print('RS Skewness: {}'.format(batting_df['RS'].skew()))
 print('RS Kurtosis: {}'.format(batting_df['RS'].kurt()))
-
-print('#Conclusion: Team RS distribution is approximately normal')
 
 # yearly changes in RS
 yearly_rs = pd.concat([batting_df['YEAR'], batting_df['RS']], axis=1)
@@ -125,7 +125,7 @@ cols = list(corr_df.columns)
 batting_df = batting_df[cols]
 print(batting_df.head())
 
-# new correlation matrix
+# new correlation matrix for selected data features
 fig, ax = plt.subplots(figsize=(10, 10))
 
 corr = batting_df.corr()
@@ -136,7 +136,7 @@ plt.title('Correlation Matrix')
 plt.show()
 
 
-# dependent variables EDA
+# independent variables EDA
 # histograms
 cols = list(batting_df.drop(['RS'], axis=1).columns)
 
@@ -148,12 +148,14 @@ for col, ax in zip(cols, axes.flatten()[:11]):
 
 plt.show()
 
-# normality
-for col in cols:
-    print('{} Skewness: {}'.format(col ,batting_df[col].skew()))
-    print('{} Kurtosis: {}'.format(col, batting_df[col].kurt()))
+# Q-Q plots
+fig, axes = plt.subplots(4, 3, figsize=(21, 21))
 
-print('#Conclusion: all the independent variables seem to follow normal distributions')
+for col, ax in zip(cols, axes.flatten()[:11]):
+    stats.probplot(batting_df[col], plot=ax)
+    ax.set_title('{} Q-Q Plot'.format(col))
+
+plt.show()
 
 # scatter plots
 fig, axes = plt.subplots(4, 3, figsize=(20, 20))
