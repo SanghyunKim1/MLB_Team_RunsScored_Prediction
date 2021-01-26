@@ -85,8 +85,8 @@ According to the histogram and probability plot above, **RS** seems to follow a 
 | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: |
 | **RS** | 1.0 | 0.739 | 0.922 | 0.829 | 0.920 | 0.950 | 0.812 | 0.745 | 0.711 | 0.751 | 0.806 | 0.780 |
 
-Initially, I had too many independent variables (24 in total) to predict **RS**. So I dropped some of them based on their correlations with **RS** (cut-off point: 0.65).
-As a result, 11 data features are selected as indicated in the correlation heatmap above.
+Initially, I had too many independent variables (24 in total). So I dropped some of them based on their correlations with **RS** (threshold: 0.65).
+As a result, 11 data features have been selected as indicated in the correlation matrix above.
 
 
 ***4-3. Filtered Independent Variables EDA***
