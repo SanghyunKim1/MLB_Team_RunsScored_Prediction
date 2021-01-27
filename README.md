@@ -85,8 +85,8 @@ According to the histogram and probability plot above, **RS** seems to follow a 
 | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: |
 | **RS** | 1.0 | 0.739 | 0.922 | 0.829 | 0.920 | 0.950 | 0.812 | 0.745 | 0.711 | 0.751 | 0.806 | 0.780 |
 
-Initially, I had too many independent variables (24 in total) to predict **RS**. So I dropped some of them based on their correlations with **RS** (cut-off point: 0.65).
-As a result, 11 data features are selected as indicated in the correlation heatmap above.
+Initially, I had too many independent variables (24 in total). So I dropped some of them based on their correlations with **RS** (threshold: 0.65).
+As a result, 11 data features have been selected as indicated in the correlation matrix above.
 
 
 ***4-3. Filtered Independent Variables EDA***
@@ -164,7 +164,7 @@ However, the differences in the R-squared between those two models are marginal,
 
 ### 9. Conclusion
 
-Comparing those two models, although the simple linear regression model has the higher R-squared, the differences between these two models seem margianl.
+Comparing those two models, although the simple linear regression model has higher R-squared, the differences between these two models seem marginal.
 
 One possible reason for such a result is because these two predictors (**OPS** vs **OPB**+**ISO**) measure similar things in baseball. For those who are not familiar with baseball, let me briefly talk about what these three stats measure in baeball.
 
