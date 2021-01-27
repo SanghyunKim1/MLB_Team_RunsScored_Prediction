@@ -209,7 +209,7 @@ plt.show()
 
 
 
-### 4. Multiple Linear Regression with feature selection
+### 4. Multiple Linear Regression with feature selection ###
 # feature selection with SelectKBest
 df = pd.concat([df['RS'], scaled_df], axis=1)
 x = df.iloc[:, df.columns != 'RS']
