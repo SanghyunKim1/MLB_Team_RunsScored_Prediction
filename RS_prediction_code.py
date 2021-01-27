@@ -7,6 +7,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import StandardScaler
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+from sklearn.feature_selection import SelectKBest, f_regression
 import statsmodels.api as sm
 from scipy import stats
 from math import sqrt
@@ -104,63 +105,77 @@ ax.set(title='Yearly Changes in Team Runs Scored')
 plt.show()
 
 # correlation matrix
-corr = batting_df.corr()
+corrMatrix = batting_df.corr()
 fig, ax = plt.subplots(figsize=(8, 8))
 
-sns.heatmap(corr, square=True)
+sns.heatmap(corrMatrix, square=True)
 plt.title('Correlation Matrix')
 
 plt.show()
 
-# drop variables that have lower correlations with 'RS' than 0.65
-corr = abs(batting_df.corr())
-corr_df = corr['RS'].to_frame(name='Correlation with RS').T
-corr_cols = corr_df.columns
+# multicollinearity detection
+corrMatrix = abs(batting_df.corr())
+cols = list(corrMatrix.columns)
+rows = list(corrMatrix.index)
+print(corrMatrix.to_string())
 
-corr_df.drop(columns=corr_cols[(corr_df < 0.65).any()], inplace=True)
-print(corr_df.to_string())
+vars_keep = []
+threshold = 0.7
 
-cols = list(corr_df.columns)
+for col in cols:
+    for row in rows:
+            # filter variables that have lower correlations with 'RS' than 0.65
+            if corrMatrix[col]['RS'] >= 0.65:
+                # among pairs of collinear variables, keep either one that have higher correlations with 'RS'
+                if corrMatrix[col][row] >= threshold and corrMatrix[col][row] != 1:
 
-batting_df = batting_df[cols]
-print(batting_df.head())
+                    if corrMatrix[col]['RS'] > corrMatrix['RS'][row]:
+                        if col not in vars_keep:
+                            vars_keep.append(col)
+                    else:
+                        if col in vars_keep:
+                            vars_keep.remove(col)
+                        elif row not in vars_keep:
+                            vars_keep.append(row)
+            else:
+                pass
+print('Filtered Variables: {}'.format(vars_keep))
+batting_df = batting_df[vars_keep]
 
-# new correlation matrix for selected data features
+# new correlation matrix for filtered data features
 fig, ax = plt.subplots(figsize=(10, 10))
 
-corr = batting_df.corr()
-sns.heatmap(corr, square=True, annot=True, annot_kws={'size':10},
-            xticklabels=corr.columns, yticklabels=corr.columns)
+corrMatrix = batting_df.corr()
+sns.heatmap(corrMatrix, square=True, annot=True, annot_kws={'size':10},
+            xticklabels=corrMatrix.columns, yticklabels=corrMatrix.columns)
 plt.title('Correlation Matrix')
 
 plt.show()
 
-
 # independent variables EDA
+cols = list(batting_df.drop('RS', axis=1).columns)
 # histograms
-cols = list(batting_df.drop(['RS'], axis=1).columns)
+fig, axes = plt.subplots(3, 3, figsize=(15, 15))
 
-fig, axes = plt.subplots(4, 3, figsize=(20, 24))
-
-for col, ax in zip(cols, axes.flatten()[:11]):
+for col, ax in zip(cols, axes.flatten()[:8]):
     sns.histplot(batting_df[col], kde=True, color='red', ax=ax)
     ax.set_title('Team {} Histogram'.format(col))
 
 plt.show()
 
 # Q-Q plots
-fig, axes = plt.subplots(4, 3, figsize=(21, 21))
+fig, axes = plt.subplots(3, 3, figsize=(17, 17))
 
-for col, ax in zip(cols, axes.flatten()[:11]):
+for col, ax in zip(cols, axes.flatten()[:8]):
     stats.probplot(batting_df[col], plot=ax)
     ax.set_title('{} Q-Q Plot'.format(col))
 
 plt.show()
 
 # scatter plots
-fig, axes = plt.subplots(4, 3, figsize=(20, 20))
+fig, axes = plt.subplots(3, 3, figsize=(15, 15))
 
-for col, ax in zip(cols, axes.flatten()[:11]):
+for col, ax in zip(cols, axes.flatten()[:8]):
     sns.regplot(x=col, y='RS', data=batting_df, scatter_kws={'color': 'navy'},
                 line_kws={'color': 'red'}, ax=ax)
     ax.set_title('Correlation between {} and RS'.format(col))
@@ -197,220 +212,231 @@ plt.show()
 
 
 
-### 4. Multiple Linear Regression with feature selection
-
-# check multicollinearity
-df = pd.concat([batting_df['RS'], scaled_df], axis=1)
-x = df.drop(['RS'], axis=1)
-x = sm.add_constant(x)
-y = df['RS']
-
-lm_rs = sm.OLS(y, x)
-result_rs = lm_rs.fit()
-print(result_rs.summary())
-
-vif = pd.DataFrame()
-vif['Feature'] = lm_rs.exog_names
-vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
-print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
-
-# exclude 'OPS'
-x = df.drop(['RS', 'OPS'], axis=1)
-x = sm.add_constant(x)
-y = df['RS']
-
-lm_rs = sm.OLS(y, x)
-result_rs = lm_rs.fit()
-print(result_rs.summary())
-
-vif = pd.DataFrame()
-vif['Feature'] = lm_rs.exog_names
-vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
-print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
-
-# exclude 'HRr', 'PA', 'TB', and 'SLG'
-x = df.drop(['RS', 'OPS', 'HRr', 'PA', 'TB', 'SLG'], axis=1)
-x = sm.add_constant(x)
-y = df['RS']
-
-lm_rs = sm.OLS(y, x)
-result_rs = lm_rs.fit()
-print(result_rs.summary())
-
-vif = pd.DataFrame()
-vif['Feature'] = lm_rs.exog_names
-vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
-print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
-
-# exclude 'HR', 'DRAA', 'BWARP'
-x = df.drop(['RS', 'OPS', 'HRr', 'PA', 'TB', 'SLG', 'HR', 'DRAA', 'BWARP'], axis=1)
-x = sm.add_constant(x)
-y = df['RS']
-
-lm_rs = sm.OLS(y, x)
-result_rs = lm_rs.fit()
-print(result_rs.summary())
-
-vif = pd.DataFrame()
-vif['Feature'] = lm_rs.exog_names
-vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
-print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
-
-# include 'OPS' again
-x = df.drop(['RS', 'HRr', 'PA', 'TB', 'SLG', 'HR', 'DRAA', 'BWARP'], axis=1)
-x = sm.add_constant(x)
-y = df['RS']
-
-lm_rs = sm.OLS(y, x)
-result_rs = lm_rs.fit()
-print(result_rs.summary())
-
-vif = pd.DataFrame()
-vif['Feature'] = lm_rs.exog_names
-vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
-print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
-
-# exclude 'OBP'
-x = df.drop(['RS', 'HRr', 'PA', 'TB', 'SLG', 'HR', 'DRAA', 'BWARP', 'OBP'], axis=1)
-x = sm.add_constant(x)
-y = df['RS']
-
-lm_rs = sm.OLS(y, x)
-result_rs = lm_rs.fit()
-print(result_rs.summary())
-
-vif = pd.DataFrame()
-vif['Feature'] = lm_rs.exog_names
-vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
-print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
-
-# exclude 'OPS' and include 'OBP', TB' again
-x = df.drop(['RS', 'HRr', 'PA', 'SLG', 'HR', 'DRAA', 'BWARP', 'OPS'], axis=1)
-x = sm.add_constant(x)
-y = df['RS']
-
-lm_rs = sm.OLS(y, x)
-result_rs = lm_rs.fit()
-print(result_rs.summary())
-
-vif = pd.DataFrame()
-vif['Feature'] = lm_rs.exog_names
-vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
-print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
-
-# exclude 'TB'
-x = df.drop(['RS', 'HRr', 'PA', 'SLG', 'HR', 'DRAA', 'BWARP', 'OPS', 'TB'], axis=1)
-x = sm.add_constant(x)
-y = df['RS']
-
-lm_rs = sm.OLS(y, x)
-result_rs = lm_rs.fit()
-print(result_rs.summary())
-
-vif = pd.DataFrame()
-vif['Feature'] = lm_rs.exog_names
-vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
-print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
-
-# exclude 'DRC+'
-x = df.drop(['RS', 'HRr', 'PA', 'SLG', 'HR', 'DRAA', 'BWARP', 'OPS', 'TB', 'DRC+'], axis=1)
-x = sm.add_constant(x)
-y = df['RS']
-
-lm_rs = sm.OLS(y, x)
-result_rs = lm_rs.fit()
-print(result_rs.summary())
-
-vif = pd.DataFrame()
-vif['Feature'] = lm_rs.exog_names
-vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
-print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
-# conclusion: the best multiple liear regression model is when independent variables are 'OBP and 'ISO'
-
-# split data into training and test data and build a multiple linear regression model
-# multiple linear regression (x:'OBP', 'ISO' / y:'RS')
-x = df[['OBP', 'ISO']]
-y = df['RS']
-
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1)
-
-lm = linear_model.LinearRegression().fit(x_train, y_train)
-
-y_predict = lm.predict(x_test)
-
-print('------- Multiple Linear Regression -------')
-print('------- Intercept -------')
-print(lm.intercept_)
-
-print('------- Coefficient -------')
-print(lm.coef_)
-
-print('------- RMSE -------')
-mse = metrics.mean_squared_error(y_test, y_predict)
-print(sqrt(mse))
-
-print('------- R-squared -------')
-print(metrics.r2_score(y_test, y_predict))
-
-
-
-### 5. Simple Linear Regression ###
-
-# correlation
-print('------- Correlations with RS -------')
-print(batting_df.corr().to_string())
-
-# select 'OPS', which has the highest correlation with 'RS' (0.950), as an independent variable
-# simple linear regression (x:'OPS' / y:'RS')
-x = np.array(batting_df['OPS']).reshape(-1, 1)
-y = batting_df['RS']
-
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1)
-
-lm_rs2 = linear_model.LinearRegression().fit(x_train, y_train)
-
-y_predicted = lm_rs2.predict(x_test)
-
-print('------- Simple Linear Regression -------')
-print('------- Intercept -------')
-print(lm_rs2.intercept_)
-
-print('------- Coefficient -------')
-print(lm_rs2.coef_)
-
-print('------- RMSE -------')
-mse = metrics.mean_squared_error(y_test, y_predicted)
-print(sqrt(mse))
-
-print('------- R-squared -------')
-print(metrics.r2_score(y_test, y_predicted))
-
-
-
-### 6. Model Validation ###
-
-# 10-Fold Cross Validation for the multiple linear regression model
-model = LinearRegression()
-x = df[['OBP', 'ISO']]
-y = df['RS']
-
-cv_r2 = cross_val_score(model, x, y, scoring='r2', cv=10)
-cv_mse = cross_val_score(model, x, y, scoring='neg_mean_squared_error', cv=10)
-cv_rmse = np.sqrt(-1 * cv_mse)
-
-print('------- Multiple Linear Regression Validation -------')
-print('Mean R-squared: {}'.format(cv_r2.mean()))
-print('Mean RMSE: {}'.format(cv_rmse.mean()))
-
-# 10-Fold Cross Validation for the simple linear regression model
-model = LinearRegression()
-x = np.array(batting_df['OPS']).reshape(-1, 1)
-y = batting_df['RS']
-
-cv_r2 = cross_val_score(model, x, y, scoring='r2', cv=10)
-cv_mse = cross_val_score(model, x, y, scoring='neg_mean_squared_error', cv=10)
-cv_rmse = np.sqrt(-1 * cv_mse)
-
-print('------- Simple Linear Regression Validation -------')
-print('Mean R-squared: {}'.format(cv_r2.mean()))
-print('Mean RMSE: {}'.format(cv_rmse.mean()))
+# ### 4. Multiple Linear Regression with feature selection
+#
+# # check multicollinearity
+# df = pd.concat([batting_df['RS'], scaled_df], axis=1)
+# x = df.drop(['RS'], axis=1)
+# x = sm.add_constant(x)
+# y = df['RS']
+#
+# lm_rs = sm.OLS(y, x)
+# result_rs = lm_rs.fit()
+# print(result_rs.summary())
+#
+# vif = pd.DataFrame()
+# vif['Feature'] = lm_rs.exog_names
+# vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
+# print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
+#
+# # exclude 'OPS'
+# x = df.drop(['RS', 'OPS'], axis=1)
+# x = sm.add_constant(x)
+# y = df['RS']
+#
+# lm_rs = sm.OLS(y, x)
+# result_rs = lm_rs.fit()
+# print(result_rs.summary())
+#
+# vif = pd.DataFrame()
+# vif['Feature'] = lm_rs.exog_names
+# vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
+# print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
+#
+# # exclude 'HRr', 'PA', 'TB', and 'SLG'
+# x = df.drop(['RS', 'OPS', 'HRr', 'PA', 'TB', 'SLG'], axis=1)
+# x = sm.add_constant(x)
+# y = df['RS']
+#
+# lm_rs = sm.OLS(y, x)
+# result_rs = lm_rs.fit()
+# print(result_rs.summary())
+#
+# vif = pd.DataFrame()
+# vif['Feature'] = lm_rs.exog_names
+# vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
+# print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
+#
+# # exclude 'HR', 'DRAA', 'BWARP'
+# x = df.drop(['RS', 'OPS', 'HRr', 'PA', 'TB', 'SLG', 'HR', 'DRAA', 'BWARP'], axis=1)
+# x = sm.add_constant(x)
+# y = df['RS']
+#
+# lm_rs = sm.OLS(y, x)
+# result_rs = lm_rs.fit()
+# print(result_rs.summary())
+#
+# vif = pd.DataFrame()
+# vif['Feature'] = lm_rs.exog_names
+# vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
+# print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
+#
+# # include 'OPS' again
+# x = df.drop(['RS', 'HRr', 'PA', 'TB', 'SLG', 'HR', 'DRAA', 'BWARP'], axis=1)
+# x = sm.add_constant(x)
+# y = df['RS']
+#
+# lm_rs = sm.OLS(y, x)
+# result_rs = lm_rs.fit()
+# print(result_rs.summary())
+#
+# vif = pd.DataFrame()
+# vif['Feature'] = lm_rs.exog_names
+# vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
+# print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
+#
+# # exclude 'OBP'
+# x = df.drop(['RS', 'HRr', 'PA', 'TB', 'SLG', 'HR', 'DRAA', 'BWARP', 'OBP'], axis=1)
+# x = sm.add_constant(x)
+# y = df['RS']
+#
+# lm_rs = sm.OLS(y, x)
+# result_rs = lm_rs.fit()
+# print(result_rs.summary())
+#
+# vif = pd.DataFrame()
+# vif['Feature'] = lm_rs.exog_names
+# vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
+# print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
+#
+# # exclude 'OPS' and include 'OBP', TB' again
+# x = df.drop(['RS', 'HRr', 'PA', 'SLG', 'HR', 'DRAA', 'BWARP', 'OPS'], axis=1)
+# x = sm.add_constant(x)
+# y = df['RS']
+#
+# lm_rs = sm.OLS(y, x)
+# result_rs = lm_rs.fit()
+# print(result_rs.summary())
+#
+# vif = pd.DataFrame()
+# vif['Feature'] = lm_rs.exog_names
+# vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
+# print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
+#
+# # exclude 'TB'
+# x = df.drop(['RS', 'HRr', 'PA', 'SLG', 'HR', 'DRAA', 'BWARP', 'OPS', 'TB'], axis=1)
+# x = sm.add_constant(x)
+# y = df['RS']
+#
+# lm_rs = sm.OLS(y, x)
+# result_rs = lm_rs.fit()
+# print(result_rs.summary())
+#
+# vif = pd.DataFrame()
+# vif['Feature'] = lm_rs.exog_names
+# vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
+# print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
+#
+# # exclude 'DRC+'
+# x = df.drop(['RS', 'HRr', 'PA', 'SLG', 'HR', 'DRAA', 'BWARP', 'OPS', 'TB', 'DRC+'], axis=1)
+# x = sm.add_constant(x)
+# y = df['RS']
+#
+# lm_rs = sm.OLS(y, x)
+# result_rs = lm_rs.fit()
+# print(result_rs.summary())
+#
+# vif = pd.DataFrame()
+# vif['Feature'] = lm_rs.exog_names
+# vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
+# print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
+# # conclusion: the best multiple liear regression model is when independent variables are 'OBP and 'ISO'
+#
+# # split data into training and test data and build a multiple linear regression model
+# # multiple linear regression (x:'OBP', 'ISO' / y:'RS')
+# x = df[['OBP', 'ISO']]
+# y = df['RS']
+#
+# x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1)
+#
+# lm = linear_model.LinearRegression().fit(x_train, y_train)
+#
+# y_predict = lm.predict(x_test)
+#
+# print('------- Multiple Linear Regression -------')
+# print('------- Intercept -------')
+# print(lm.intercept_)
+#
+# print('------- Coefficient -------')
+# print(lm.coef_)
+#
+# print('------- RMSE -------')
+# mse = metrics.mean_squared_error(y_test, y_predict)
+# print(sqrt(mse))
+#
+# print('------- R-squared -------')
+# print(metrics.r2_score(y_test, y_predict))
+#
+#
+#
+# ### 5. Simple Linear Regression ###
+#
+# # univariate feature selection
+# x = df.loc[:, df.columns != 'RS']
+# y = df['RS']
+#
+# x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1)
+#
+# selector = SelectKBest(score_func=f_regression, k=1)
+# selected_x_train = selector.fit_transform(x_train, y_train)
+# selected_x_test = selector.transform(x_test)
+#
+# all_cols = x.columns
+# selected_mask = selector.get_support()
+# selected_var = all_cols[selected_mask]
+#
+# print('Selected Independent Variable: {}'.format(selected_var.values))
+#
+# # simple linear regression (x:'OPS' / y:'RS')
+# x = np.array(batting_df['OPS']).reshape(-1, 1)
+# y = batting_df['RS']
+#
+# x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1)
+#
+# lm_rs2 = linear_model.LinearRegression().fit(x_train, y_train)
+#
+# y_predicted = lm_rs2.predict(x_test)
+#
+# print('------- Simple Linear Regression -------')
+# print('------- Intercept -------')
+# print(lm_rs2.intercept_)
+#
+# print('------- Coefficient -------')
+# print(lm_rs2.coef_)
+#
+# print('------- RMSE -------')
+# mse = metrics.mean_squared_error(y_test, y_predicted)
+# print(sqrt(mse))
+#
+# print('------- R-squared -------')
+# print(metrics.r2_score(y_test, y_predicted))
+#
+#
+#
+# ### 6. Model Validation ###
+#
+# # 10-Fold Cross Validation for the multiple linear regression model
+# model = LinearRegression()
+# x = df[['OBP', 'ISO']]
+# y = df['RS']
+#
+# cv_r2 = cross_val_score(model, x, y, scoring='r2', cv=10)
+# cv_mse = cross_val_score(model, x, y, scoring='neg_mean_squared_error', cv=10)
+# cv_rmse = np.sqrt(-1 * cv_mse)
+#
+# print('------- Multiple Linear Regression Validation -------')
+# print('Mean R-squared: {}'.format(cv_r2.mean()))
+# print('Mean RMSE: {}'.format(cv_rmse.mean()))
+#
+# # 10-Fold Cross Validation for the simple linear regression model
+# model = LinearRegression()
+# x = np.array(batting_df['OPS']).reshape(-1, 1)
+# y = batting_df['RS']
+#
+# cv_r2 = cross_val_score(model, x, y, scoring='r2', cv=10)
+# cv_mse = cross_val_score(model, x, y, scoring='neg_mean_squared_error', cv=10)
+# cv_rmse = np.sqrt(-1 * cv_mse)
+#
+# print('------- Simple Linear Regression Validation -------')
+# print('Mean R-squared: {}'.format(cv_r2.mean()))
+# print('Mean RMSE: {}'.format(cv_rmse.mean()))
