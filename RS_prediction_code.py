@@ -215,7 +215,7 @@ df = pd.concat([df['RS'], scaled_df], axis=1)
 x = df.iloc[:, df.columns != 'RS']
 y = df['RS']
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1)
 
 selector = SelectKBest(score_func=f_regression, k=2)
 selected_x_train = selector.fit_transform(x_train, y_train)
@@ -238,7 +238,7 @@ print(result_rs.summary())
 vif = pd.DataFrame()
 vif['Feature'] = lm_rs.exog_names
 vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
-print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
+print(vif[vif['Feature'] != 'const'])
 
 
 # split data into training and test data and build a multiple linear regression model
