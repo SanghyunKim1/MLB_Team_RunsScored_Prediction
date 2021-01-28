@@ -116,7 +116,7 @@ plt.title('Correlation Matrix')
 plt.show()
 
 # multicollinearity detection
-# 1. if correlations between independent variables are higher than 0.9 drop that variables
+# 1. drop independent variables if its correlation between other independent variables is higher than 0.95
 no_target = batting_df.iloc[:, batting_df.columns != 'RS']
 
 corrMatrix = abs(no_target.corr())
@@ -137,7 +137,7 @@ for col in cols:
 filtered_vars = list(df.columns)
 print('Filtered Variables: {}'.format(filtered_vars))
 
-df = batting_df[filtered_vars]
+df = df[filtered_vars]
 
 # new correlation matrix for filtered data features
 fig, ax = plt.subplots(figsize=(10, 10))
@@ -223,8 +223,8 @@ rfe = RFE(lm, 2)
 x_rfe = rfe.fit_transform(x, y)
 lm.fit(x_rfe, y)
 
-temp = pd.Series(rfe.support_,index = cols)
-selected_vars = list(temp[temp==True].index)
+temp = pd.Series(rfe.support_, index=cols)
+selected_vars = list(temp[temp == True].index)
 print('Selected Features: {}'.format(selected_vars))
 
 # check VIF
@@ -277,31 +277,31 @@ y = batting_df['RS']
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1)
 
 selector = SelectKBest(score_func=f_regression, k=1)
-selected_x_train = selector.fit_transform(x_train, y_train)
-selected_x_test = selector.transform(x_test)
+selected_xTrain = selector.fit_transform(x_train, y_train)
+selected_xTest = selector.transform(x_test)
 
 all_cols = x.columns
 selected_mask = selector.get_support()
-selected_var = all_cols[selected_mask]
+selected_var = all_cols[selected_mask].values
 
-print('Selected Feature: {}'.format(selected_var.values))
+print('Selected Feature: {}'.format(selected_var))
 
 # simple linear regression (x:'OPS' / y:'RS')
-x = np.array(batting_df['OPS']).reshape(-1, 1)
+x = np.array(batting_df[selected_var]).reshape(-1, 1)
 y = batting_df['RS']
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1)
 
-lm_rs2 = linear_model.LinearRegression().fit(x_train, y_train)
+lm = linear_model.LinearRegression().fit(x_train, y_train)
 
-y_predicted = lm_rs2.predict(x_test)
+y_predicted = lm.predict(x_test)
 
 print('------- Simple Linear Regression -------')
 print('------- Intercept -------')
-print(lm_rs2.intercept_)
+print(lm.intercept_)
 
 print('------- Coefficient -------')
-print(lm_rs2.coef_)
+print(lm.coef_)
 
 print('------- RMSE -------')
 mse = metrics.mean_squared_error(y_test, y_predicted)
