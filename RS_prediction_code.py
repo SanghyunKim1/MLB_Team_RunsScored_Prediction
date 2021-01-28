@@ -210,34 +210,35 @@ plt.show()
 
 
 ### 4. Multiple Linear Regression with feature selection ###
-# feature selection with SelectKBest
+# Recursive Feature Elimination
 df = pd.concat([df['RS'], scaled_df], axis=1)
-x = df.iloc[:, df.columns != 'RS']
+
+x = df.loc[:, df.columns != 'RS']
 y = df['RS']
+cols = list(x.columns)
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1)
+lm = LinearRegression()
 
-selector = SelectKBest(score_func=f_regression, k=2)
-selected_x_train = selector.fit_transform(x_train, y_train)
-selected_x_test = selector.transform(x_test)
+rfe = RFE(lm, 2)
+x_rfe = rfe.fit_transform(x, y)
+lm.fit(x_rfe, y)
 
-all_names = x.columns
-selected_mask = selector.get_support()
-selected_vars = all_names[selected_mask]
-print('Selected Features: {}'.format((selected_vars.values)))
+temp = pd.Series(rfe.support_,index = cols)
+selected_vars = list(temp[temp==True].index)
+print('Selected Features: {}'.format(selected_vars))
 
 # check VIF
 x = df[selected_vars]
 x = sm.add_constant(x)
 y = df['RS']
 
-lm_rs = sm.OLS(y, x)
-result_rs = lm_rs.fit()
+lm = sm.OLS(y, x)
+result_rs = lm.fit()
 print(result_rs.summary())
 
 vif = pd.DataFrame()
-vif['Feature'] = lm_rs.exog_names
-vif['VIF'] = [variance_inflation_factor(lm_rs.exog, i) for i in range(lm_rs.exog.shape[1])]
+vif['Feature'] = lm.exog_names
+vif['VIF'] = [variance_inflation_factor(lm.exog, i) for i in range(lm.exog.shape[1])]
 print(vif[vif['Feature'] != 'const'])
 
 
