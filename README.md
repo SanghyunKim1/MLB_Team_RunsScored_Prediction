@@ -78,7 +78,7 @@ That's the nature of baseball: Runs Scored and Runs Allowed. In this project, I'
 According to the histogram and probability plot above, **RS** seems to follow a normal distribution. The skewness of 0.35 and kurtosis of 0.06 also indicate that team **RS** data is normallly distributed. Likewise, the boxplots above show that team **RS** has been normally distributed over the last 10 seasons with few outliers.
 
 
-***4-2. Filter Method***
+***4-2. Feature Selection: Filter Method***
 
 <img src="https://github.com/shk204105/MLB_Team_RunsScored_Prediction/blob/master/images/Filtered%20Correlation%20Matrix.png" width="500" height="500">
 
