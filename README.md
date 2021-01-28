@@ -123,9 +123,7 @@ The result of the model is:
 
 
 ### 7. Simple Linear Regression
-When building a regression model, the goal is to build a model that has the least possible number of independent variables with as high accuracy as possible. Thus, I also conducted a simple linear regression model.
-
-Based on the correlations between all the independent variables and **RS**, I've chosen **OPS** as the independent variable since it has the highest correlation with **RS** (about 0.950).
+Apart from the multiple linear regression model, I also built a simple linear regression model. To find the sinlge best independent variable, I used the **SelectKBest** function. Based on F-statistics of each independent variable, **OPS** has beend selected as the best independent variable.
 
 Furthermore, I also splitted data into training(70%) and test(30%) datasets for accuracy.
 
@@ -133,10 +131,10 @@ The result of the model is:
 
 | **Measurement** | **Score** | 
 | :-----------: | :-----------: |
-| ***Intercept*** | -743.6951063742002 |
-| ***Coefficient*** | 1998.01555622 |
-| ***R-squared*** | 0.9089167630414022 |
-| ***RMSE*** | 21.648415497233565 |
+| ***Intercept*** | -752.3837394309697 |
+| ***Coefficient*** | 2009.36777208 |
+| ***R-squared*** | 0.9079557000049954 |
+| ***RMSE*** | 23.207166436311425 |
 
 
 ### 8. Model Validation
@@ -148,36 +146,37 @@ To validate both multiple and simple linear regression models, I used the K-Fold
 
 | **Measurement** | **Score** | 
 | :-----------: | :-----------: |
-| ***Mean R-squared*** | 0.8585418632931796 |
-| ***Mean RMSE*** | 24.2713173773183 |
+| ***Mean R-squared*** | 0.8584381525775473 |
+| ***Mean RMSE*** | 24.92574073069298 |
 
 ***8-2. Simple Linear Regression model validtion***
 
 | **Measurement** | **Score** | 
 | :-----------: | :-----------: |
-| ***Mean R-squared*** | 0.8610824571143236 |
-| ***Mean RMSE*** | 24.3774278935756 |
+| ***Mean R-squared*** | 0.8610824571143239 |
+| ***Mean RMSE*** | 24.37742789357559 |
 
-Accoring to the results above, the simple linear regression model (x:**OPS** / y:**RS**) showed a slightly higher R-squared than the multiple linear regression model (x:**OBP**, **ISO** / y:**RS**).
+Accoring to the results above, the simple linear regression model (x:**OPS** / y:**RS**) showed a slightly higher R-squared than the multiple linear regression model (x:**TB**, **OBP** / y:**RS**).
 However, the differences in the R-squared between those two models are marginal, and as both models don't overfit data, it's safe to use either model to predict team **RS**.
 
 
 ### 9. Conclusion
 
-Comparing those two models, although the simple linear regression model has higher R-squared, the differences between these two models seem marginal.
+Comparing those two models through 10-Fold Cross Validation, although the simple linear regression seems more accurate, the differences between these two models seem marginal.
 
-One possible reason for such a result is because these two predictors (**OPS** vs **OPB**+**ISO**) measure similar things in baseball. For those who are not familiar with baseball, let me briefly talk about what these three stats measure in baeball.
+One possible reason for such a result is because these two predictors (**OPS** vs **TB + OBP**) measure similar things in baseball. For those who are not familiar with baseball, let me briefly talk about what these three stats measure in baeball.
 
-First, [**OBP**](http://m.mlb.com/glossary/standard-stats/on-base-percentage) (On-Base Percentage) measures how many times a batter reaches bases (e.g an **OBP** of 0.400 means that this batter has reached bases four times in 10 plate appearances). It includes *Hits*, *Base-on-Balls* and *Hit-by-Pitches*.
 
-Second, [**ISO**](http://m.mlb.com/glossary/advanced-stats/isolated-power) measures the raw power of a batter. It's calculated as the difference between *BA(Batting Averages)* and *SLG*. For simplicity, it measures how often a batter advances runners on bases (i.e. **extra-base hits**).
+Frist, [**TB**](http://m.mlb.com/glossary/standard-stats/total-bases) measures total number of bases gained through hits. It assigns **1 total base** to a single, **2 total bases** to a double, **3 total bases** to a triple and **4 total bases** to a home run. Therefore, a team's TB shows how many singles as well as extra hits, which possibly advance runners on base, have been gained throughout the season by that team.
 
-Finally, [**OPS**](http://m.mlb.com/glossary/standard-stats/on-base-plus-sluggin) is the sum of **OBP** and [**SLG**](http://m.mlb.com/glossary/standard-stats/slugging-percentage). **SLG** here refers to *Slugging Percentage*. This **SLG** shows the total number of bases (*single*+*extra-base hits*) a hitter records per at-bat. As it doesn't include *Base-on-Balls* and *Hit-by-Pitches*, if we combine **OBP** and **SLG** together, we get a single statistic that measures similar things that **OBP + ISO** does.
+Second, [**OBP**](http://m.mlb.com/glossary/standard-stats/on-base-percentage) (On-Base Percentage) measures how many times a batter reaches bases (e.g an **OBP** of 0.400 means that this batter has reached bases four times in 10 plate appearances). It includes *Hits*, *Base-on-Balls* and *Hit-by-Pitches*.
+
+Finally, [**OPS**](http://m.mlb.com/glossary/standard-stats/on-base-plus-sluggin) is the sum of **OBP** and [**SLG**](http://m.mlb.com/glossary/standard-stats/slugging-percentage). **SLG** here refers to *Slugging Percentage*. This **SLG** shows the total number of bases (*single*+*extra-base hits*) a hitter records per at-bat. As it doesn't include *Base-on-Balls* and *Hit-by-Pitches*, if we combine **OBP** and **SLG** together, we get a single statistic that measures similar things that **TB + OBP** does.
 
 The nature of baseball again. As I mentioned at the beginning of this project, a team should outscore its opponents to win a game in baseball. To do so, that team has to score and it's indicated as **Runs Scored (RS)**, the dependent variable. Then how does a team score runs?
 
 Simple. To score runs in baseball, a team's batters must reach bases (i.e. runners on bases) and other batters must advance these runners on bases to drive runs. This is how a team scores in baseball.
 
-And this is what either **OPS** or **OBP + ISO** measure, (a) the ability to reach bases as well as (b) the ability to advance runners on bases to drive runs.
+And this is what either **OPS** or **TB + OBP** measure, (a) the ability to reach bases, and (b) the ability to advance runners on bases to drive runs.
 
 Given this fact, there's no wonder that those two different models yield the similar level of accuracy. Each predictor(s) measures similar things. Therefore, we might have got the similar result. Therefore, although the simple linear regression model where the independent variable is **OPS** yields a marginally more accurate result, I believe we'd get similar results no matter which one we use to predict team **RS**.
