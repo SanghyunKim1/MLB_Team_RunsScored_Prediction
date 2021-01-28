@@ -65,6 +65,7 @@ That's the nature of baseball: Runs Scored and Runs Allowed. In this project, I'
 - Renamed **'R'** data feature as **'RS'** for clarity.
 - Eliminated commas in some data features and convert their data types from **integer** into **numeric** (**'PA'**, **'AB'**, **'H'**, **'SO'**).
 - Confirmed that there are no missing values and duplicates.
+- Dropped categorical variables (**LG** and **TEAM**), as they are not related to our analysis.
 
 ### 4. EDA (Exploratory Data Analysis)
 ***4-1. RS EDA***
@@ -77,25 +78,24 @@ That's the nature of baseball: Runs Scored and Runs Allowed. In this project, I'
 According to the histogram and probability plot above, **RS** seems to follow a normal distribution. The skewness of 0.35 and kurtosis of 0.06 also indicate that team **RS** data is normallly distributed. Likewise, the boxplots above show that team **RS** has been normally distributed over the last 10 seasons with few outliers.
 
 
-***4-2. Correlation EDA***
+***4-2. Filter Method***
 
-<img src="https://user-images.githubusercontent.com/67542497/105629053-1b33b680-5e84-11eb-8717-ee73189af8e3.png" width="500" height="500">
+<img src="https://github.com/shk204105/MLB_Team_RunsScored_Prediction/blob/master/images/Filtered%20Correlation%20Matrix.png" width="500" height="500">
 
-| ***Correlation*** | **RS** | **PA** | **TB** | **OBP** | **SLG** | **OPS** | **ISO** | **HR** | **HRr** | **DRC+** | **DRAA** | **BWARP** |
-| :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: |
-| **RS** | 1.0 | 0.739 | 0.922 | 0.829 | 0.920 | 0.950 | 0.812 | 0.745 | 0.711 | 0.751 | 0.806 | 0.780 |
+| ***Correlation*** | **RS** | **PA** | **TB** | **OBP** | **ISO** | **DRC+** | **DRAA** | **BWARP** |
+| :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: |
+| **RS** | 1.0 | 0.739 | 0.922 | 0.829 | 0.812 | 0.751 | 0.806 | 0.780 |
 
-Initially, I had too many independent variables (24 in total). So I dropped some of them based on their correlations with **RS** (threshold: 0.65).
-As a result, 11 data features have been selected as indicated in the correlation matrix above.
+Initially, I had 24 independent variables. To avoid multicollinearity, I filtered some of them based on (i) correlation between each **independent** variable, and (ii) correlation between those filtered features and the **dependent** variable, **RS**. As a result, I ended up **7** independent varaibles as indicated in the correlation matrix above. 
 
 
 ***4-3. Filtered Independent Variables EDA***
 
-<img src="https://user-images.githubusercontent.com/67542497/105629048-17a02f80-5e84-11eb-977a-7d2a5dc43438.png" width="800" height="800">
+<img src="https://github.com/shk204105/MLB_Team_RunsScored_Prediction/blob/master/images/Histogram.png" width="800" height="800">
 
 According to the histograms of each independent variable above, all the variables are normally distributed.
 
-<img src="https://user-images.githubusercontent.com/67542497/105629057-1cfd7a00-5e84-11eb-8ea9-ed824baf24aa.png" width="600" height="600">
+<img src="https://github.com/shk204105/MLB_Team_RunsScored_Prediction/blob/master/images/Scatter%20plot.png" width="600" height="600">
 
 Scatter plots also depict that there are reasonable linear trends between each independent variable and **RS** without notable outliers, and thus, it's safe to use the linear regression model.
 
@@ -105,21 +105,21 @@ Since the ranges of independent variables vary considerably, I scaled all the in
 
 The result of feature scaling is the following:
 
-<img src="https://user-images.githubusercontent.com/67542497/105629054-1bcc4d00-5e84-11eb-934a-c7efe9d98fbc.png" width="600" height="600">
+<img src="https://github.com/shk204105/MLB_Team_RunsScored_Prediction/blob/master/images/KDE%20plot.png" width="600" height="600">
 
 
 ### 6. Multiple Linear Regression with Feature Selection
-I included all the independent variables in an initial multiple linear regression model to identify multicollinearity. After building this model, I also created a Variance Inflation Factor (VIF) data frame and the result is following:
+With all the independent variables filtered above, I built a multiple linear regression model to check the degree of multicollinearity based on **VIF**.
 
-<img width="207" alt="VIF" src="https://user-images.githubusercontent.com/67542497/105631676-f8f56500-5e92-11eb-9959-70ddbd1644fb.png">
+<img width="207" alt="VIF" src="https://github.com/shk204105/MLB_Team_RunsScored_Prediction/blob/master/images/VIF1.png">
 
-According to the table above, there is very strong multicollinearity in the model because independent variables are highly corrleated one another.
-Therefore, I used a stepwise feature selection method until I got the best couple of data attributes.
+According to the table above, there seems to be multicollinearity in the model because independent variables are highly corrleated one another.
+Therefore, I used the wrapper method (**Recursive Feature Elimination**) to find the best two independent variables.
 
-After repeating feature-inclusion/exclusion process based on VIF and correlations with RS, I got **OBP** and **ISO** as the independent variables in our multiple linear regression model.
+Through **RFE**, I got **TB** and **OBP** as independent variables and built a multiple linear regression.
 The result of the model is:
 
-<img width="601" alt="Multiple Linear Regression" src="https://user-images.githubusercontent.com/67542497/105631900-1a0a8580-5e94-11eb-85fa-8b68b3bb492f.png"> <img width="193" alt="VIF2" src="https://user-images.githubusercontent.com/67542497/105631903-1c6cdf80-5e94-11eb-9025-2c86950abd0e.png">
+<img width="601" alt="Multiple Linear Regression" src="https://github.com/shk204105/MLB_Team_RunsScored_Prediction/blob/master/images/Multiple%20Linear%20Regression.png"> <img width="193" alt="VIF2" src="https://github.com/shk204105/MLB_Team_RunsScored_Prediction/blob/master/images/VIF2.png">
 
 
 ### 7. Simple Linear Regression
