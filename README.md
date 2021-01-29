@@ -169,7 +169,8 @@ One possible reason for such a result is because these two predictors (**OPS** v
 
 Frist, [**TB**](http://m.mlb.com/glossary/standard-stats/total-bases) measures total number of bases gained through hits. It assigns **1 total base** to a single, **2 total bases** to a double, **3 total bases** to a triple and **4 total bases** to a home run. Therefore, a team's TB shows how many singles as well as extra hits, which possibly advance runners on base, have been gained throughout the season by that team.
 
-Second, [**OBP**](http://m.mlb.com/glossary/standard-stats/on-base-percentage) (On-Base Percentage) measures how many times a batter reaches bases (e.g an **OBP** of 0.400 means that this batter has reached bases four times in 10 plate appearances). It includes *Hits*, *Base-on-Balls* and *Hit-by-Pitches*.
+Second, [**OBP**](http://m.mlb.com/glossary/standard-stats/on-base-percentage) (On-Base Percentage) measures how *often* a batter reaches bases (e.g an **OBP** of 0.400 means that this batter has reached bases four times in 10 plate appearances). It includes *Hits (singles + extra hits)*, *Base-on-Balls* and *Hit-by-Pitches*.
+While **TB** measures total number of bases gained, **OBP** measures the efficiency of a batter in terms of the ability to reach bases.
 
 Finally, [**OPS**](http://m.mlb.com/glossary/standard-stats/on-base-plus-sluggin) is the sum of **OBP** and [**SLG**](http://m.mlb.com/glossary/standard-stats/slugging-percentage). **SLG** here refers to *Slugging Percentage*. This **SLG** shows the total number of bases (*single*+*extra-base hits*) a hitter records per at-bat. As it doesn't include *Base-on-Balls* and *Hit-by-Pitches*, if we combine **OBP** and **SLG** together, we get a single statistic that measures similar things that **TB + OBP** does.
 
