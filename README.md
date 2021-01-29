@@ -179,4 +179,4 @@ Simple. To score runs in baseball, a team's batters must reach bases (i.e. becom
 
 And this is what either **OPS** or **TB + OBP** measure, (a) the ability to reach bases, and (b) the ability to advance runners on bases to drive runs.
 
-Given this fact, there's no wonder that those two different models yield the similar level of accuracy. Bothe independet variables measure similar things. Therefore, we might have got the similar result. Although the simple linear regression model where the independent variable is **OPS** yields a marginally more accurate result, I believe we'd get similar results no matter which one we use to predict team **RS**.
+Given this fact, there's no wonder that those two different models yield the similar level of accuracy. Bothe independet variables measure similar things. Therefore, we get the similar result. Although the simple linear regression model where the independent variable is **OPS** yields a marginally more accurate result, I believe we'd get similar results no matter which one we use to predict team **RS**.
