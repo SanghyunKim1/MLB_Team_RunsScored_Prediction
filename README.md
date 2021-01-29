@@ -33,7 +33,7 @@ That's the nature of baseball: Runs Scored and Runs Allowed. In this project, I'
 | :-----------: | :-----------: |
 | ***LG*** | AL: American League / NL: National League |
 | ***YEAR*** | Each year refers to corresponding seasons |
-| ***TM*** | All 30 Major League Baseball Teams |
+| ***TEAM*** | All 30 Major League Baseball Teams |
 | ***G*** | Number of games played in the corresponding season |
 | ***PA*** | [Plate Appearance](http://m.mlb.com/glossary/standard-stats/plate-appearance) |
 | ***AB*** | [At-bat](http://m.mlb.com/glossary/standard-stats/at-bat) |
