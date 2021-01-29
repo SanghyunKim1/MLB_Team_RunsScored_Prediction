@@ -175,7 +175,7 @@ Finally, [**OPS**](http://m.mlb.com/glossary/standard-stats/on-base-plus-sluggin
 
 The nature of baseball again. As I mentioned at the beginning of this project, a team should outscore its opponents to win a game in baseball. To do so, that team has to score and it's indicated as **Runs Scored (RS)**, the dependent variable. Then how does a team score runs?
 
-Simple. To score runs in baseball, a team's batters must reach bases (i.e. runners on bases) and other batters must advance these runners on bases to drive runs. This is how a team scores in baseball.
+Simple. To score runs in baseball, a team's batters must reach bases (i.e. become runners on bases) and other batters must advance these runners on bases to drive runs. This is how a team scores in baseball.
 
 And this is what either **OPS** or **TB + OBP** measure, (a) the ability to reach bases, and (b) the ability to advance runners on bases to drive runs.
 
