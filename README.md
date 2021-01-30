@@ -20,7 +20,7 @@ Making money, making fans enthusiastic, having fans in ballparks etc... But the 
 Okay, now we understand that we should focus on wins, then HOW do we win? (i.e. what makes that wins) As in other sports, a baseball team should score runs and prevent opponents from scoring to win a game.
 
 Alright, we're almost there. Your goal is to win, and therefore, your team must outscore its opponents to do so.
-That's the nature of baseball: Runs Scored and Runs Allowed. In this project, I'll pretty much focus on the first part of baseball, **Runs Scored**.
+That's the nature of baseball: *Runs Scored* and *Runs Allowed*. In this project, I'll pretty much focus on the first part of baseball, **Runs Scored**.
 
 ### 2. Metadata
 | **Metadata** | **Information** |
