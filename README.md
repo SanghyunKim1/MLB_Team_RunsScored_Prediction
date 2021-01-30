@@ -15,7 +15,7 @@
 Before we dive into our analysis, let's briefly talk about the nature of baseball.
 
 Say you are an owner of a baseball team, then why do you think you are running your team spending billions of dollars per season? 
-Making money, making fans enthusiastic, having fans in ballparks etc... But the ulitmate goal of running a baseball club, as with other sports teams, will be winning. As the owner of your team, your goal should be winning, and thus, you should try to buy wins not just players. This is where sabermetrics (SABR + metrics) has originated. Interesting, isn't it?
+Making money, making fans enthusiastic, having fans in ballparks etc... But the ulitmate goal of running a baseball club, as with other sports teams, will be winning. As the owner of your team, your goal should be winning, and thus, you should try to buy wins not just players. This is where **sabermetrics** (SABR + metrics) has originated. Interesting, right?
 
 Okay, now we understand that we should focus on wins, then HOW do we win? (i.e. what makes that wins) As in other sports, a baseball team should score runs and prevent opponents from scoring to win a game.
 
