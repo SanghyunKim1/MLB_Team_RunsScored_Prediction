@@ -65,7 +65,7 @@ That's the nature of baseball: *Runs Scored* and *Runs Allowed*. In this project
 - Renamed **'R'** data feature as **'RS'** for clarity.
 - Eliminated commas in some data features and convert their data types from **integer** into **numeric** (**'PA'**, **'AB'**, **'H'**, **'SO'**).
 - Confirmed that there are no missing values and duplicates.
-- Dropped categorical variables (**LG** and **TEAM**), as they are not related to our analysis.
+- Dropped categorical variables (**LG** and **TEAM**), as they're irrelevant to this analysis.
 
 ### 4. EDA (Exploratory Data Analysis)
 ***4-1. RS EDA***
