@@ -86,7 +86,7 @@ According to the histogram and probability plot above, **RS** seems to follow a 
 | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: |
 | **RS** | 1.0 | 0.739 | 0.922 | 0.829 | 0.812 | 0.751 | 0.806 | 0.780 |
 
-Initially, I had 24 independent variables. To avoid multicollinearity, I filtered some of them based on (i) correlation between each **independent** variable, and (ii) correlation between those filtered features and the **dependent** variable, **RS**. As a result, I ended up **7** independent varaibles as indicated in the correlation matrix above. 
+Initially, I had 24 independent variables. To avoid multicollinearity, I filtered some of them based on (a) correlation between each **independent** variable, and (b) correlation between those filtered features and the **dependent** variable, **RS**. As a result, I ended up **7** independent varaibles as indicated in the correlation matrix above. 
 
 
 ***4-3. Filtered Independent Variables EDA***
