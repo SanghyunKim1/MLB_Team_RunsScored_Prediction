@@ -113,7 +113,7 @@ With all the independent variables filtered above, I built a multiple linear reg
 
 <img width="207" alt="VIF" src="https://github.com/shk204105/MLB_Team_RunsScored_Prediction/blob/master/images/VIF1.png">
 
-According to the table above, there seems to be multicollinearity in the model because independent variables are highly corrleated one another.
+According to the table above, there seems to be multicollinearity in the model because independent variables are still highly corrleated one another.
 Therefore, I used the wrapper method (**Recursive Feature Elimination**) to find the best two independent variables.
 
 Through **RFE**, I got **TB** and **OBP** as independent variables and built a multiple linear regression.
