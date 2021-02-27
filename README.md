@@ -134,9 +134,9 @@ The result of the model is:
 
 
 ### 8. Simple Linear Regression
-Apart from the multiple linear regression model, I also built a simple linear regression model. To find the sinlge best independent variable, I used the **SelectKBest** function. Based on F-statistics of each independent variable, **OPS** has beend selected as the best independent variable.
+Apart from the multiple linear regression model, I also built a simple linear regression model. To find the sinlge best independent variable, I used the **SelectKBest** function. Based on F-statistics of each independent variable, **OPS** has been selected as the best independent variable.
 
-Furthermore, I also splitted data into training(70%) and test(30%) datasets for accuracy.
+Furthermore, I also splitted data into training(70%) and test(30%) datasets to avoid overfitting.
 
 The result of the model is:
 
