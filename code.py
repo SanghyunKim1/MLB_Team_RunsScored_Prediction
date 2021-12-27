@@ -17,7 +17,7 @@ warnings.filterwarnings('ignore')
 from matplotlib.axes._axes import _log as matplotlib_axes_logger
 matplotlib_axes_logger.setLevel('ERROR')
 
-### Purpose of Work: predicting a team's runs scored based on various batting statistics
+### Purpose of Work: predicting a team's runs scored based on various team batting statistics
 
 # load datasets
 batting_2019 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB Analysis/MLB_Team_RunsScored_Prediction/data/batting_2019.csv')
@@ -34,7 +34,7 @@ batting_2010 = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB 
 # merge datasets
 batting_dfs = [batting_2019, batting_2018, batting_2017, batting_2016, batting_2015,
                batting_2014, batting_2013, batting_2012, batting_2011, batting_2010]
-batting_df = reduce(lambda x, y: pd.merge(x, y, how='outer'), batting_dfs)
+batting_df = reduce(lambda x, y: pd.merge(x, y, how = 'outer'), batting_dfs)
 print(batting_df.head().to_string())
 
 
