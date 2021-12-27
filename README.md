@@ -97,7 +97,7 @@ According to the histogram and probability plot above, **RS** seems to follow a 
 | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: |
 | **RS** | 1.0 | 0.739 | 0.922 | 0.829 | 0.812 | 0.751 | 0.806 | 0.780 |
 
-Initially, I had 24 independent variables. To avoid multicollinearity, I filtered some of them based on (a) correlation between each **independent** variable, and (b) correlation between those filtered features and the **dependent** variable, **RS**. As a result, I ended up **7** independent varaibles as indicated in the correlation matrix above. 
+Initially, I had 24 independent variables. To avoid multicollinearity, I filtered some of them based on (a) correlation between each **independent** variable, and (b) correlation between those filtered features and the **dependent** variable, **RS**. As a result, I ended up with **7** independent varaibles as indicated in the correlation matrix above. 
 
 
 ***5-3. Filtered Independent Variables EDA***
@@ -124,7 +124,7 @@ With all the independent variables filtered above, I built a multiple linear reg
 
 <img width="207" alt="VIF" src="https://github.com/shk204105/MLB_Team_RunsScored_Prediction/blob/master/images/VIF1.png">
 
-According to the table above, there seems to be multicollinearity in the model because independent variables are still highly corrleated one another.
+According to the table above, there seems to be multicollinearity in the model because independent variables are still highly correlated one another.
 Therefore, I used the wrapper method (**Recursive Feature Elimination**) to find the best two independent variables.
 
 Through **RFE**, I got **TB** and **OBP** as independent variables and built a multiple linear regression.
