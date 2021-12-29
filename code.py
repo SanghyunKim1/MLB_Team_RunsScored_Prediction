@@ -60,11 +60,11 @@ obj_cols = list(batting_df.select_dtypes(include='object').columns)
 print(batting_df[obj_cols].head())
 
 # eliminate commas
-comma_cols = ['PA', 'AB', 'H', 'SO']
-batting_df[comma_cols] = batting_df[comma_cols].replace(',', '', regex=True)
+batting_df.replace(',', '', regex = True, inplace = True)
 
 # change data types
-batting_df[comma_cols] = batting_df[comma_cols].apply(pd.to_numeric)
+obj_cols = ['PA', 'AB', 'H', 'SO']
+batting_df[obj_cols] = batting_df[obj_cols].apply(pd.to_numeric)
 
 # check new data types
 print(batting_df.dtypes)
