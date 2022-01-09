@@ -428,3 +428,5 @@ fig.subplots_adjust(bottom = 0.15)
 plt.show()
 
 # create era columns
+print(season_df[["RS", "OBP", "ISO", "OPS"]].corr().to_string())
+print(batting_df[["RS", "OBP", "ISO", "OPS"]].corr().to_string())
