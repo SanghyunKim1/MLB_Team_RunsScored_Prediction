@@ -9,11 +9,10 @@ from sklearn import linear_model, metrics
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split, cross_val_score
 from statsmodels.stats.outliers_influence import variance_inflation_factor
-from sklearn.feature_selection import RFE,  SelectKBest, f_regression
+from sklearn.feature_selection import RFE, SelectKBest, f_regression
 from mlxtend.feature_selection import SequentialFeatureSelector as SFS
 import statsmodels.api as sm
 from scipy import stats
-from yellowbrick.regressor import residuals_plot
 from math import sqrt
 import warnings
 warnings.filterwarnings('ignore')
@@ -47,10 +46,10 @@ print(batting_df.isnull().sum())
 # check duplicated data
 print("Total number of duplicates in batting data: {}".format(batting_df.duplicated().sum()))
 
-# create a new column for Total Base data "TB"
+# create a new column for "Total Base (TB)" data
 batting_df["TB"] = batting_df["1B"] + (2 * batting_df["2B"]) + (3 * batting_df["3B"]) + (4 * batting_df["HR"])
 
-# create league data: National League (NL) / American League (AL)
+# export league data: National League (NL) / American League (AL)
 nl_teams = ["ATL", "CHC", "CIN", "COL", "LAD",
             "MIL", "NYM", "PHI", "PIT", "SDP",
             "SFG", "STL", "ARI", "WSN", "FLA",
@@ -77,13 +76,13 @@ batting_df["League"] = batting_df.apply(lambda x: get_league(x), axis = 1)
 print(batting_df.dtypes)
 
 # check memory usage
-print(batting_df.memory_usage(deep = True))
+print("Total Memory Usage Before: {}".format(batting_df.memory_usage(deep = True).sum()))
 
 # to save memory usage, change "League" and "Team" data type
 batting_df["Team"] = batting_df["Team"].astype("category")
 batting_df["League"] = batting_df["League"].astype("category")
 
-print(batting_df.memory_usage(deep = True))
+print("Total Memory Usage After: {}".format(batting_df.memory_usage(deep = True).sum()))
 
 # reorder data columns
 cols = ["Season", "League"] + list(batting_df.columns)[1:-1]
@@ -93,30 +92,32 @@ batting_df = batting_df.reindex(columns = cols)
 
 # 2. EDA (Exploratory Data Analysis)
 # 2-1. RS Analysis: How did the league average runs scored change over time?
-print("------- Runs Scored Data Descriptive Summary by Season -------")
+print("------- Team Runs Scored Descriptive Summary -------")
 print(batting_df["RS"].describe())
 
 season_df = batting_df.groupby("Season")
 lg_avg_rs = season_df["RS"].mean().round(1).reset_index()
-print("------- Changes in League Average Runs Scored -------")
+print("------- Yearly Changes in League Average Runs Scored -------")
 print(lg_avg_rs)
 
 # bar plot
 values = np.array(lg_avg_rs["RS"])
 idx = np.array(lg_avg_rs["Season"])
-colors = ["navy" if (x < 730) else "red" for x in values]
-red_bar = mpatches.Patch(color = 'red', label = "RS >= 730")
-navy_bar = mpatches.Patch(color = 'navy', label = "RS < 730")
+colors = ["navy" if (x < 731) else "red" for x in values]
+red_bar = mpatches.Patch(color = 'red', label = "RS >= 731")
+navy_bar = mpatches.Patch(color = 'navy', label = "RS < 731")
 
-fig, ax = plt.subplots(figsize = (10, 7))
+fig, ax = plt.subplots(figsize = (12, 8))
 
-plt.bar(idx, values, color = colors, zorder = 3)
+plt.bar(idx, values, edgecolor = "darkgrey", linewidth=0.6, color = colors, zorder = 3)
 plt.xticks(lg_avg_rs["Season"], rotation = 45)
 plt.xlabel("Season")
 plt.ylabel("League Average Runs Scored")
-plt.title("Changes in League Average Runs Scored", fontsize = 14, fontweight = "bold")
-plt.legend(handles = [red_bar, navy_bar], loc = "upper right")
+plt.title("Yearly Changes in League Average Runs Scored", fontsize = 18)
+plt.legend(handles = [red_bar, navy_bar], ncol = 2,
+           bbox_to_anchor= (0.84, -0.10), loc = "upper center")
 plt.grid(zorder = 0)
+fig.subplots_adjust(bottom = 0.15)
 plt.show()
 
 # box plot
@@ -124,13 +125,13 @@ fig, ax = plt.subplots(figsize = (10, 9))
 
 sns.boxplot(x = "Season", y = "RS", data = batting_df, ax = ax)
 ax.set_xticklabels(ax.get_xticklabels(), rotation = 45)
-ax.set(title = "Yearly Changes in Team Runs Scored")
+ax.set(title = "Yearly Changes in League Average Runs Scored")
 plt.show()
 
 # 2-2. RS Analysis: In which League (NL vs AL) did teams scored more?: Two-sample t-test
 # group data based on "League" data values
 lg_df = batting_df.groupby("League")
-print("------- Runs Scored Data Descriptive Summary by League -------")
+print("------- Team Runs Scored Data Descriptive Summary by League -------")
 print(lg_df["RS"].describe())
 
 nl_rs = batting_df.loc[batting_df["League"] == "NL"]["RS"]
@@ -155,8 +156,8 @@ al_rs = batting_df.loc[batting_df["League"] == "AL"]["RS"]
 fig, axes = plt.subplots(1, 2, figsize = (20, 8))
 stats.probplot(nl_rs, plot = axes[0])
 stats.probplot(al_rs, plot = axes[1])
-axes[0].set_title("National League Runs Scored Q-Q Plot without 2020 Season")
-axes[1].set_title("American League Runs Scored Q-Q Plot without 2020 Season")
+axes[0].set_title("National League Runs Scored QQ Plot without 2020 Season")
+axes[1].set_title("American League Runs Scored QQ Plot without 2020 Season")
 plt.show()
 
 # check an equal-variance assumption
@@ -165,33 +166,25 @@ print("AL Runs Scored Variance: {}".format(al_rs.var()))
 
 # box plot
 fig, ax = plt.subplots(figsize = (8, 8))
-sns.boxplot(x = "League", y = "RS", data = batting_df, palette = "Set1")
+sns.boxplot(x = "League", y = "RS", data = batting_df, palette = "Set1", boxprops = dict(alpha = 0.5))
 ax.set(title = "Runs Scored Distribution by League")
 plt.show()
 
 # Welch's two-sample t-test
-test_result = pg.ttest(al_rs, nl_rs, paired = False, alternative='greater', correction = True).round(3)
-print("Welch's two-sample t-test result")
+test_result = pg.ttest(al_rs, nl_rs, paired = False, alternative = 'greater', correction = True).round(3)
+print("------- Welch's two-sample t-test result -------")
 print(test_result.to_string())
 # given the p-value is approximately 0, we reject H0
 # and have a strong evidence that AL teams scored more than NL teams on average
 
-# 'RS' histogram and Q-Q plot
-fig, axes = plt.subplots(1, 2, figsize=(20, 8))
+# 'RS' histogram and QQ plot
+fig, axes = plt.subplots(1, 2, figsize = (20, 8))
 
-sns.histplot(batting_df['RS'], kde = True, ax = axes[0])
+sns.histplot(batting_df['RS'], kde = True, ax = axes[0], color = "navy")
 axes[0].set_title('Team RS Histogram')
-
-axes[1] = stats.probplot(batting_df['RS'], plot=plt)
-plt.title('Team RS Q-Q Plot')
-
+axes[1] = stats.probplot(batting_df['RS'], plot = plt)
+plt.title('Team RS QQ Plot')
 plt.show()
-
-print('------- Team RS Data Distribution -------')
-print('Mean RS: {}'.format(batting_df['RS'].mean()))
-print('Median RS: {}'.format(batting_df['RS'].median()))
-print('RS Skewness: {}'.format(batting_df['RS'].skew()))
-print('RS Kurtosis: {}'.format(batting_df['RS'].kurt()))
 
 
 
@@ -200,7 +193,7 @@ print('RS Kurtosis: {}'.format(batting_df['RS'].kurt()))
 corrMatrix = batting_df.corr()
 fig, ax = plt.subplots(figsize = (8, 8))
 
-sns.heatmap(corrMatrix, square = True)
+sns.heatmap(corrMatrix, square = True, linewidths = 0.3)
 plt.title('Correlation Matrix')
 plt.show()
 
@@ -227,7 +220,7 @@ filtered_df.drop(vars_to_drop, axis = 1, inplace = True)
 fig, ax = plt.subplots(figsize = (10, 10))
 
 corrMatrix = filtered_df.corr()
-sns.heatmap(corrMatrix, square = True, annot = True, annot_kws = {'size': 10},
+sns.heatmap(corrMatrix, square = True, linewidths = 0.5, annot = True, annot_kws = {'size': 10},
             xticklabels = corrMatrix.columns, yticklabels = corrMatrix.columns)
 plt.title('Correlation Matrix')
 
@@ -274,7 +267,7 @@ sfs = SFS(lm, k_features = 2, forward = False, verbose = 2,
 sfs.fit(x, y)
 print("\nBackward Selection Features: {}\n".format(sfs.k_feature_names_))
 # from both Recursive Feature Elimination and Backward Selection methods,
-# I ended up with two most significant independent variables: "OBP" and "ISO"
+# I ended up with the two most significant independent variables: "OBP" and "ISO"
 
 # select final features
 filtered_df = batting_df.loc[:, ["RS", "OBP", "ISO"]]
@@ -291,9 +284,7 @@ y = filtered_df['RS']
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, random_state = 1)
 
 mlr = linear_model.LinearRegression().fit(x_train, y_train)
-
 y_predict = mlr.predict(x_test)
-resid = y_test - y_predict
 
 # 4-1. Assumption checking
 # linearity
@@ -313,7 +304,17 @@ plt.show()
 
 # homoscedasticity
 # residual plot
-residuals_plot(LinearRegression(), x_train, y_train, x_test, y_test)
+model = linear_model.LinearRegression().fit(x, y)
+fitted_y = model.predict(x)
+resid = fitted_y - y
+
+fig = plt.subplots(figsize = (12, 8))
+sns.residplot(fitted_y, "RS", data = filtered_df, lowess = True,
+              scatter_kws = {"alpha": 0.5}, line_kws = {"color": "red", "lw": 1})
+plt.xlabel("Fitted values")
+plt.ylabel("Residuals")
+plt.title("Residuals vs Fitted")
+plt.show()
 
 # normality
 # QQ plot
@@ -324,22 +325,18 @@ plt.show()
 
 # independence
 # given that data observations are independent of each other,
-# the independence assumption is satisified
+# the independence assumption is satisfied
 
 # multiple linear regression results
 print('------- Multiple Linear Regression -------')
-print('------- Intercept -------')
-print(mlr.intercept_)
+print("Intercept: {}".format(mlr.intercept_))
 
-print('------- Coefficient -------')
-print(mlr.coef_)
+print("Coefficients: {}".format(mlr.coef_))
 
-print('------- RMSE -------')
 mse = metrics.mean_squared_error(y_test, y_predict)
-print(sqrt(mse))
+print("RMSE: {}".format(sqrt(mse)))
 
-print('------- R-squared -------')
-print(metrics.r2_score(y_test, y_predict))
+print("R-squared: {}".format(metrics.r2_score(y_test, y_predict)))
 
 
 
@@ -372,18 +369,14 @@ lm = linear_model.LinearRegression().fit(x_train, y_train)
 y_predicted = lm.predict(x_test)
 
 print('------- Simple Linear Regression -------')
-print('------- Intercept -------')
-print(lm.intercept_)
+print("Intercept: {}".format(lm.intercept_))
 
-print('------- Coefficient -------')
-print(lm.coef_)
+print("Coefficients: {}".format(lm.coef_))
 
-print('------- RMSE -------')
 mse = metrics.mean_squared_error(y_test, y_predicted)
-print(sqrt(mse))
+print("RMSE: {}".format(sqrt(mse)))
 
-print('------- R-squared -------')
-print(metrics.r2_score(y_test, y_predicted))
+print("R-squared: {}".format(metrics.r2_score(y_test, y_predicted)))
 
 
 
@@ -414,3 +407,24 @@ cv_rmse = np.sqrt(-1 * cv_mse)
 print('------- Simple Linear Regression Validation -------')
 print('Mean R-squared: {}'.format(cv_r2.mean()))
 print('Mean RMSE: {}'.format(cv_rmse.mean()))
+
+
+
+# 7. Cross-era comparison
+# compare how league median "OBP", "ISO", and "OPS" changed over time
+median_metrics = season_df[["OBP", "ISO", "OPS"]].median().reset_index()
+melted_df = median_metrics.melt("Season", var_name = "Metrics", value_name = "League Median")
+
+fig, ax = plt.subplots(figsize = (12, 8))
+sns.lineplot(x = "Season", y = "League Median", hue = "Metrics", data = melted_df,
+             palette = ["royalblue", "lightskyblue", "midnightblue"])
+plt.xticks(melted_df["Season"], rotation = 45)
+plt.title("Yearly Changes in League Median Metrics", fontsize = 18)
+plt.legend(bbox_to_anchor= (0.86, -0.10), loc = "upper center", ncol = 3)
+plt.axvline(x = 2006, color='red', linestyle = "--")
+plt.axvline(x = 2014, color='red', linestyle = "--")
+plt.grid()
+fig.subplots_adjust(bottom = 0.15)
+plt.show()
+
+# create era columns
