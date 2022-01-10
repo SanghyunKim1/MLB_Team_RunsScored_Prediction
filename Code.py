@@ -233,11 +233,11 @@ x = num_df.loc[:, num_df.columns != 'RS']
 y = num_df['RS']
 cols = list(x.columns)
 
-lm = LinearRegression()
+model = LinearRegression()
 
-rfe = RFE(lm, 2)
+rfe = RFE(estimator = model, n_features_to_select = 2)
 x_rfe = rfe.fit_transform(x, y)
-lm.fit(x_rfe, y)
+model.fit(x_rfe, y)
 
 temp = pd.Series(rfe.support_, index = cols)
 selected_vars = list(temp[temp == True].index)
@@ -267,19 +267,18 @@ sfs = SFS(lm, k_features = 2, forward = False, verbose = 2,
 sfs.fit(x, y)
 print("\nBackward Selection Features: {}\n".format(sfs.k_feature_names_))
 # from both Recursive Feature Elimination and Backward Selection methods,
-# I ended up with the two most significant independent variables: "OBP" and "ISO"
+# it turns out that the two most significant independent variables are: "OBP" and "ISO"
 
-# select final features
-filtered_df = batting_df.loc[:, ["RS", "OBP", "ISO"]]
+# select final features for multiple linear regression model
+mlr_df = batting_df.loc[:, ["RS", "OBP", "ISO"]]
 
 
 
 # 4. Multiple Linear Regression with feature selection
-
 # split data into training and test data and build a multiple linear regression model
 # multiple linear regression (x:'OBP', 'ISO' / y:'RS')
-x = filtered_df[selected_vars]
-y = filtered_df['RS']
+x = mlr_df[selected_vars]
+y = mlr_df['RS']
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, random_state = 1)
 
@@ -289,12 +288,12 @@ y_predict = mlr.predict(x_test)
 # 4-1. Assumption checking
 # linearity
 # scatter plots
-cols = list(filtered_df.drop('RS', axis = 1).columns)
+cols = list(mlr_df.drop('RS', axis = 1).columns)
 
 fig, axes = plt.subplots(1, 2, figsize = (18, 8))
 
 for col, ax in zip(cols, axes.flatten()[:2]):
-    sns.regplot(x = col, y = 'RS', data = filtered_df, scatter_kws = {'color': 'navy'},
+    sns.regplot(x = col, y = 'RS', data = mlr_df, scatter_kws = {'color': 'navy'},
                 line_kws = {'color': 'red'}, ax = ax)
     ax.set_title('Correlation between {} and RS'.format(col))
     ax.set_xlabel(col)
@@ -309,7 +308,7 @@ fitted_y = model.predict(x)
 resid = fitted_y - y
 
 fig = plt.subplots(figsize = (12, 8))
-sns.residplot(fitted_y, "RS", data = filtered_df, lowess = True,
+sns.residplot(fitted_y, "RS", data = mlr_df, lowess = True,
               scatter_kws = {"alpha": 0.5}, line_kws = {"color": "red", "lw": 1})
 plt.xlabel("Fitted values")
 plt.ylabel("Residuals")
@@ -344,7 +343,7 @@ print("R-squared: {}".format(metrics.r2_score(y_test, y_predict)))
 # univariate feature selection
 num_df = batting_df.select_dtypes(exclude = "category")
 x = num_df.loc[:, num_df.columns != 'RS']
-y = batting_df['RS']
+y = num_df['RS']
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, random_state = 1)
 
@@ -416,6 +415,7 @@ median_metrics = season_df[["OBP", "ISO", "OPS"]].median().reset_index()
 melted_df = median_metrics.melt("Season", var_name = "Metrics", value_name = "League Median")
 
 fig, ax = plt.subplots(figsize = (12, 8))
+
 sns.lineplot(x = "Season", y = "League Median", hue = "Metrics", data = melted_df,
              palette = ["royalblue", "lightskyblue", "midnightblue"])
 plt.xticks(melted_df["Season"], rotation = 45)
@@ -427,6 +427,55 @@ plt.grid()
 fig.subplots_adjust(bottom = 0.15)
 plt.show()
 
-# create era columns
-print(season_df[["RS", "OBP", "ISO", "OPS"]].corr().to_string())
-print(batting_df[["RS", "OBP", "ISO", "OPS"]].corr().to_string())
+# divide seasons into "Era" bins data
+def get_era(data):
+    if data["Season"] <= 2006:
+        return "Steroid Era"
+    elif data["Season"] > 2006 and data["Season"] <= 2014:
+        return "Post-steroid Era"
+    else:
+        return "Fly-ball Revolution Era"
+
+batting_df["Era"] = batting_df.apply(lambda x: get_era(x), axis = 1)
+batting_df["Era"] = batting_df["Era"].astype("category")
+eras = batting_df["Era"].unique()
+leagues = batting_df["League"].unique()
+
+# start with data of which some features have already been filtered
+# based on pairwise correlations between independent variables above
+# also, concatenate these filtered data and "Era" data from original data
+filtered_df = pd.concat([filtered_df, batting_df["Era"]], axis = 1)
+
+# for each era, find the best two features to build a multiple linear regression model
+for era in eras:
+    data = filtered_df.loc[filtered_df["Era"] == era]
+    num_df = data.select_dtypes(exclude = "category")
+    x = num_df.loc[:, num_df.columns != 'RS']
+    y = num_df['RS']
+    cols = list(x.columns)
+
+    model = LinearRegression()
+
+    rfe = RFE(estimator = model, n_features_to_select = 2)
+    x_rfe = rfe.fit_transform(x, y)
+    model.fit(x_rfe, y)
+
+    temp = pd.Series(rfe.support_, index = cols)
+    selected_vars = list(temp[temp == True].index)
+    print('{} RFE Features: {}'.format(era, selected_vars))
+
+    x = num_df[selected_vars]
+    x = sm.add_constant(x)
+    y = num_df['RS']
+
+    lm = sm.OLS(y, x)
+    result_rs = lm.fit()
+    print("{} OLS Summary".format(era))
+    print(result_rs.summary())
+
+    vif = pd.DataFrame()
+    vif['Feature'] = lm.exog_names
+    vif['VIF'] = [variance_inflation_factor(lm.exog, i) for i in range(lm.exog.shape[1])]
+    print("{} VIF".format(era))
+    print(vif[vif['Feature'] != 'const'])
+
