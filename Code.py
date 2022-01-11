@@ -129,7 +129,7 @@ fig, ax = plt.subplots(figsize = (10, 9))
 
 sns.boxplot(x = "Season", y = "RS", data = batting_df, ax = ax)
 ax.set_xticklabels(ax.get_xticklabels(), rotation = 45)
-ax.set(title = "Team RS Distribution in each Season")
+ax.set_title("Team RS Distribution in each Season", fontsize = 20)
 plt.show()
 
 # divide seasons into "Era" groups
@@ -172,24 +172,25 @@ for era, i in zip(eras, range(1, 5)):
 fig.suptitle("Team RS QQ Plot in each Era without 2020 Season Data", fontsize = 24, y = 0.95)
 plt.show()
 
-# equal-variance assumption
+# equal-variance
 # descriptive summary
 era_df = batting_df.groupby("Era")
 rs_sum_era = era_df["RS"].describe()
+print("------- Team Runs Scored Data Descriptive Summary by Era -------")
 print(rs_sum_era.to_string())
 
 # box plot
 fig, ax = plt.subplots(figsize = (10, 9))
 
 sns.boxplot(x = "Era", y = "RS", data = batting_df, ax = ax,
-            palette = "BuPu", boxprops = dict(alpha = 0.7))
+            palette = "BuPu", boxprops = dict(alpha = 0.5))
 ax.set_xticklabels(ax.get_xticklabels())
-ax.set(title = "Team RS Distribution in each Era")
+ax.set_title("Team RS Distribution in each Era", fontsize = 20)
 plt.show()
 
 # one-way ANOVA F-test
 aov = ols("RS ~ C(Era)", data = batting_df).fit()
-aov_table = sm.stats.anova_lm(aov, typ = 2)
+aov_table = sm.stats.anova_lm(aov, typ = 1)
 print("------- One-way ANOVA F-test Result -------")
 print(aov_table.round(3))
 # since the p-value is approximately 0,
@@ -217,11 +218,11 @@ al_rs = batting_df.loc[batting_df["League"] == "AL"]["RS"]
 nl_rs = batting_df.loc[batting_df["League"] == "NL"]["RS"]
 al_rs = batting_df.loc[batting_df["League"] == "AL"]["RS"]
 
-fig, axes = plt.subplots(1, 2, figsize = (20, 8))
+fig, axes = plt.subplots(1, 2, figsize = (18, 8))
 stats.probplot(nl_rs, plot = axes[0])
 stats.probplot(al_rs, plot = axes[1])
-axes[0].set_title("National League Runs Scored QQ Plot without 2020 Season")
-axes[1].set_title("American League Runs Scored QQ Plot without 2020 Season")
+axes[0].set_title("National League Runs Scored QQ Plot without 2020 Season", fontsize = 14)
+axes[1].set_title("American League Runs Scored QQ Plot without 2020 Season", fontsize = 14)
 plt.show()
 
 # check an equal-variance assumption
@@ -354,12 +355,12 @@ y_predict = mlr.predict(x_test)
 # scatter plots
 cols = list(mlr_df.drop('RS', axis = 1).columns)
 
-fig, axes = plt.subplots(1, 2, figsize = (18, 8))
+fig, axes = plt.subplots(1, 2, figsize = (16, 10))
 
 for col, ax in zip(cols, axes.flatten()[:2]):
     sns.regplot(x = col, y = 'RS', data = mlr_df, scatter_kws = {'color': 'navy'},
                 line_kws = {'color': 'red'}, ax = ax)
-    ax.set_title('Correlation between {} and RS'.format(col))
+    ax.set_title('Correlation between {} and RS'.format(col), fontsize = 16)
     ax.set_xlabel(col)
     ax.set_ylabel('RS')
 
@@ -374,9 +375,9 @@ resid = fitted_y - y
 fig = plt.subplots(figsize = (12, 8))
 sns.residplot(fitted_y, "RS", data = mlr_df, lowess = True,
               scatter_kws = {"alpha": 0.5}, line_kws = {"color": "red", "lw": 1})
-plt.xlabel("Fitted values")
-plt.ylabel("Residuals")
-plt.title("Residuals vs Fitted")
+plt.xlabel("Fitted values", fontsize = 14)
+plt.ylabel("Residuals", fontsize = 14)
+plt.title("Residuals vs Fitted", fontsize = 20)
 plt.show()
 
 # normality
@@ -444,8 +445,7 @@ print("R-squared: {}".format(metrics.r2_score(y_test, y_predicted)))
 
 
 # 6. Model Validation
-
-# 10-Fold Cross Validation for the multiple linear regression model
+# 10-Fold Cross-validation for the multiple linear regression model
 model = LinearRegression()
 x = filtered_df[['OBP', 'ISO']]
 y = filtered_df['RS']
@@ -458,7 +458,7 @@ print('------- Multiple Linear Regression Validation -------')
 print('Mean R-squared: {}'.format(cv_r2.mean()))
 print('Mean RMSE: {}'.format(cv_rmse.mean()))
 
-# 10-Fold Cross Validation for the simple linear regression model
+# 10-Fold Cross-validation for the simple linear regression model
 model = LinearRegression()
 x = np.array(batting_df['OPS']).reshape(-1, 1)
 y = batting_df['RS']
