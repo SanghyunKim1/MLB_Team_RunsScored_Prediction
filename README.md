@@ -56,7 +56,7 @@ In this project, we'll focus on the first part: **Runs Scored**.
 
 | **Newly Created Data** | **Description** |
 | :-----------: | :-----------: |
-| **League** | AL: American League / NL: National League |
+| **League** | **AL**: American League / **NL**: National League |
 | **TB** | [TB](https://www.mlb.com/glossary/standard-stats/total-bases) |
 
 ## 🧹 Data Cleaning <a name="datacleaning"></a>
