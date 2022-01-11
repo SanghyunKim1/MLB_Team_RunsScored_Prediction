@@ -1,92 +1,93 @@
 # MLB Team Runs Scored Prediction
 
-## Content
-1. Intro: The Nature of Baseball
-2. Technologies
-3. Metadata
-4. Data Cleaning
-5. EDA (Exploratory Data Analysis)
-6. Feature Scaling
+## Table of Contents
+1. [Motivation](#motivation)
+2. [Metadata](#metadata)
+3. [Data Cleaning](#datacleaning)
+4. EDA (Exploratory Data Analysis)
+5. Feature Scaling
 7. Multiple Linear Regression with Feature Selection
 8. Simple Linear Regression
 9. Model Validation
 10. Conclusion
 
-### 1. Intro
+## 🤔 Motivation <a name="motivation"></a>
 Before we dive into our analysis, let's briefly talk about the nature of baseball.
 
-Say you are an owner of a baseball team, then why do you think you are running your team spending billions of dollars per season? 
-Making money, making fans enthusiastic, having fans in ballparks etc... But the ulitmate goal of running a baseball club, as with other sports teams, will be winning. As the owner of your team, your goal should be winning, and thus, you should try to buy wins not just players. This is where **sabermetrics** ([SABR](https://sabr.org) + metrics) has originated. Interesting, right?
+Say you are an owner of a baseball team, then why do you think you are running your team spending billions of dollars per year? 
+Making money, making fans enthusiastic, having fans in ballparks etc... But the ulitmate goal of running a baseball club, as with other sports teams, will be winning. As the owner of your team, your goal should be winning, and thus, you should try to buy wins not just players. This is where **sabermetrics** ([SABR](https://sabr.org) + metrics) has originated. Okay, interesting.
 
-Okay, now we understand that we should focus on wins, then HOW do we win? (i.e. what makes that wins?) As in other sports, a baseball team should score runs and prevent opponents from scoring to win a game.
+Now we understand that we should focus on wins, then HOW do we win? (i.e. what makes your team win?) As in other sports, a baseball team should score runs and prevent opponents from scoring to win a game at the same time.
 
 Alright, we're almost there. Your goal is to win, and therefore, your team must outscore your opponents to do so.
-That's the nature of baseball: *Runs Scored* and *Runs Allowed*. In this project, I'll pretty much focus on the first part of baseball, **Runs Scored**.
+That's the nature of baseball: **Runs Scored** and **Runs Allowed**. </br>
+In this project, we'll focus on the first part: **Runs Scored**.
 
-### 2. Techonologies
-- Python 3.8
-  * Pandas - version 1.2.2
-  * Numpy - version 1.20.1
-  * matplotlib - version 3.3.4
-  * seaborn - version 0.11.1
-  * scikit-learn - version 0.24.1
-  * statsmodels - version 0.12.2
-  * scipy - version 1.6.1
 
-### 3. Metadata
+## 📂 Metadata <a name="metadata"></a>
 | **Metadata** | **Information** |
 | :-----------: | :-----------: |
-| **Origin of Data** | [Baseball Prospectus](https://www.baseballprospectus.com) |
-| **Terms of Use** | [Terms and Conditions](https://www.baseballprospectus.com/terms-and-conditions/) |
-| **Data Structure** | 10 datasets each consisting of 31 rows * 28 columns |
+| **Origin of Data** | [FanGraphs.com](https://www.fangraphs.com) |
+| **Terms of Service** | [Terms of Service](https://www.fangraphs.com/about/terms-of-service) |
+| **Data Structure** | 22 datasets (**CSV** files) each of which consists of 30 rows * 23 columns |
 
-| **Data Feature** | **Data Meaning** |
+| **Data Feature** | **Description** |
 | :-----------: | :-----------: |
-| ***LG*** | AL: American League / NL: National League |
-| ***YEAR*** | Each year refers to corresponding seasons |
-| ***TEAM*** | All 30 Major League Baseball Teams |
-| ***G*** | Number of games played in the corresponding season |
-| ***PA*** | [Plate Appearance](http://m.mlb.com/glossary/standard-stats/plate-appearance) |
-| ***AB*** | [At-bat](http://m.mlb.com/glossary/standard-stats/at-bat) |
-| ***R*** | [Runs Scored](http://m.mlb.com/glossary/standard-stats/run) |
-| ***TB*** | [Total Bases](http://m.mlb.com/glossary/standard-stats/total-bases) |
-| ***H*** | [Hit](http://m.mlb.com/glossary/standard-stats/hit) |
-| ***AVG*** | [Batting Average](http://m.mlb.com/glossary/standard-stats/batting-average) |
-| ***OBP*** | [On-base Percentage](http://m.mlb.com/glossary/standard-stats/on-base-percentage) |
-| ***SLG*** | [Slugging Percentage](http://m.mlb.com/glossary/standard-stats/slugging-percentage) |
-| ***OPS*** | [On-base Plus Slugging](http://m.mlb.com/glossary/standard-stats/on-base-plus-slugging) |
-| ***ISO*** | [Isolated Power](http://m.mlb.com/glossary/advanced-stats/isolated-power) |
-| ***HR*** | [Home run](http://m.mlb.com/glossary/standard-stats/home-run) |
-| ***HRr*** | [Home Run Rate](https://legacy.baseballprospectus.com/glossary/index.php?mode=viewstat&stat=344) |
-| ***BB*** | [Walk](http://m.mlb.com/glossary/standard-stats/walk) |
-| ***BBr*** | [Walk Rate](https://legacy.baseballprospectus.com/glossary/index.php?mode=viewstat&stat=283) |
-| ***SO*** | [Strikeout](http://m.mlb.com/glossary/standard-stats/strikeout) |
-| ***SOr*** | [Strikeout Rate](https://legacy.baseballprospectus.com/glossary/index.php?mode=viewstat&stat=349) |
-| ***SO/BB*** | [Strikeout-to-Walk ratio (equivalently K/BB)](http://m.mlb.com/glossary/advanced-stats/strikeout-to-walk-ratio) |
-| ***SB*** | [Stolen Base](http://m.mlb.com/glossary/standard-stats/stolen-base) |
-| ***CS*** | [Caught Stealing](http://m.mlb.com/glossary/standard-stats/caught-stealing) |
-| ***SB%*** | [Stolen-base Percentage](http://m.mlb.com/glossary/standard-stats/stolen-base-percentage) |
-| ***DRC+*** | [Deserved Runs Created for a batter](https://legacy.baseballprospectus.com/glossary/index.php?mode=viewstat&stat=696) |
-| ***DRAA*** | [Deserved Runs Above Average](https://legacy.baseballprospectus.com/glossary/index.php?search=DRC_RAA) |
-| ***BWARP*** | [Batter Wins Above Replacement Player](https://legacy.baseballprospectus.com/glossary/index.php?mode=viewstat&stat=591) |
+| **Season** | Each year refers to the corresponding season |
+| **TEAM** | Team names |
+| **G** | Total number of games played by all batters for each team |
+| **PA** | [Plate Appearance](http://m.mlb.com/glossary/standard-stats/plate-appearance) |
+| **AB** | [At-bat](http://m.mlb.com/glossary/standard-stats/at-bat) |
+| **R** | [Runs Scored](http://m.mlb.com/glossary/standard-stats/run) |
+| **H** | [Hit](http://m.mlb.com/glossary/standard-stats/hit) |
+| **AVG** | [Batting Average](http://m.mlb.com/glossary/standard-stats/batting-average) |
+| **OBP** | [On-base Percentage](http://m.mlb.com/glossary/standard-stats/on-base-percentage) |
+| **SLG** | [Slugging Percentage](http://m.mlb.com/glossary/standard-stats/slugging-percentage) |
+| **OPS** | [On-base Plus Slugging](http://m.mlb.com/glossary/standard-stats/on-base-plus-slugging) |
+| **ISO** | [Isolated Power](http://m.mlb.com/glossary/advanced-stats/isolated-power) |
+| **HR** | [Home run](http://m.mlb.com/glossary/standard-stats/home-run) |
+| **BB** | [Walk](http://m.mlb.com/glossary/standard-stats/walk) |
+| **SO** | [Strikeout](http://m.mlb.com/glossary/standard-stats/strikeout) |
+| **SB** | [Stolen Base](http://m.mlb.com/glossary/standard-stats/stolen-base) |
+| **CS** | [Caught Stealing](http://m.mlb.com/glossary/standard-stats/caught-stealing) |
+| **wOBA** | [Weighted On-base Average](https://www.mlb.com/glossary/advanced-stats/weighted-on-base-average) |
+| **wRC+** | [Weighted Runs Created Plus](https://www.mlb.com/glossary/advanced-stats/weighted-runs-created-plus) |
+| **WAR** | [Wins Above Replacement](https://library.fangraphs.com/misc/war/) |
 
-### 4. Data Cleaning
-- Combined 10 different datasets (2010-2019 Season Batting datasets).
-- Dropped an unnecessary column made when combining datasets (Column: **'#'**).
+| **Newly Created Data** | **Description** |
+| :-----------: | :-----------: |
+| **League** | AL: American League / NL: National League |
+| **TB** | [TB](https://www.mlb.com/glossary/standard-stats/total-bases) |
+
+## 🧹 Data Cleaning <a name="datacleaning"></a>
+- Combined 22 different datasets (2000-2021 Season Team Batting Data).
 - Renamed **'R'** data feature as **'RS'** for clarity.
-- Eliminated commas in some data features and convert their data types from **integer** into **numeric** (**'PA'**, **'AB'**, **'H'**, **'SO'**).
-- Confirmed that there are no missing values and duplicates.
-- Dropped categorical variables (**LG** and **TEAM**), as they're irrelevant to this analysis.
+- Created new data features: **League** and **TB**
+- Confirmed that there are no missing duplicated data.
+- Converted **object** data types into **category** data types to save memory usage.
+- Reordered data features.
 
-### 5. EDA (Exploratory Data Analysis)
-***5-1. RS EDA***
-![RS Histogram:Probability Plot](https://user-images.githubusercontent.com/67542497/105629056-1cfd7a00-5e84-11eb-9166-ebbd49161ed1.png)
-<img src="https://user-images.githubusercontent.com/67542497/105629055-1c64e380-5e84-11eb-94bb-60ff4948660d.png" width="500" height="500">
+## 📊 EDA (Exploratory Data Analysis)
 
-- **RS** Skewness: 0.35264844525853095
-- **RS** Kurtosis: 0.061150254394042314
 
-According to the histogram and probability plot above, **RS** seems to follow a normal distribution. The skewness of 0.35 and kurtosis of 0.06 also indicate that team **RS** data is normallly distributed. Likewise, the boxplots above show that team **RS** has been normally distributed over the last 10 seasons with few outliers.
+## Feature Selection
+
+
+## Multiple Linear Regression
+
+
+## Simple Linear Regression
+
+
+## Model Validation
+
+
+
+## Cross-era Comparison
+
+
+
+## Conclusion
 
 
 ***5-2. Feature Selection: Filter Method***
