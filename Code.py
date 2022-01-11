@@ -103,19 +103,21 @@ print(lg_avg_rs)
 # bar plot
 values = np.array(lg_avg_rs["RS"])
 idx = np.array(lg_avg_rs["Season"])
-colors = ["navy" if (x < 731) else "red" for x in values]
-red_bar = mpatches.Patch(color = 'red', label = "RS >= 731")
-navy_bar = mpatches.Patch(color = 'navy', label = "RS < 731")
+c1 = mpatches.Patch(color = "darkred", label = "Steroid Era")
+c2 = mpatches.Patch(color = "lightcoral", label = "Post-steroid Era")
+c3 = mpatches.Patch(color = "red", label = "Fly-ball Revolution Era")
 
 fig, ax = plt.subplots(figsize = (12, 8))
 
-plt.bar(idx, values, edgecolor = "darkgrey", linewidth=0.6, color = colors, zorder = 3)
+plt.bar(idx, values, edgecolor = "darkgrey", linewidth = 0.6,
+        color = ["darkred"] * 7 + ["lightcoral"] * 8 + ["red"] * 7,
+        alpha = 0.7, zorder = 3)
 plt.xticks(lg_avg_rs["Season"], rotation = 45)
 plt.xlabel("Season")
 plt.ylabel("League Average Runs Scored")
 plt.title("Yearly Changes in League Average Runs Scored", fontsize = 18)
-plt.legend(handles = [red_bar, navy_bar], ncol = 2,
-           bbox_to_anchor= (0.84, -0.10), loc = "upper center")
+plt.legend(handles = [c1, c2, c3], ncol = 3,
+           bbox_to_anchor= (0.72, -0.12), loc = "upper center")
 plt.grid(zorder = 0)
 fig.subplots_adjust(bottom = 0.15)
 plt.show()
