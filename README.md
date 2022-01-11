@@ -81,7 +81,7 @@ In this project, we'll focus on the first part: **Runs Scored**.
 The bar plot above displays how the **league average runs scored** changed over time since the 2000 season. As we can see, although there were slight fluctuations, teams were able to score relatively many runs up until the mid 2000's (2000 ~ 2006) on average . </br>
 However, such a trend seemed to reverse after the 2006 season. For some reason, there was a clear downward trend in the league average runs scored until 2014 season. Then the league average runs scored has been increasing again since 2015 except one weird season: 2020. </br>
 (Note that the 2020 season was an abnormal 60-game season due to the pandemic, while teams usually play 162 games in a normal season.) </br>
-But can we do more reliable statistics-based analysis to figure out if such differences are siginificant? Yes: **One-way ANOVA F-test and Post-hoc test**
+Alright, it *looks* like there are differences across different eras, but can we do more reliable statistics-based analysis to figure out if such differences are siginificant? Yes: **One-way ANOVA F-test and Post-hoc test**
 
 ```python
 # team batting data: batting_df
