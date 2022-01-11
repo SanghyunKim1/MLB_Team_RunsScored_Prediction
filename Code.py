@@ -5,13 +5,15 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import seaborn as sns
 import pingouin as pg
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
+import statsmodels.stats.multicomp as mc
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 from sklearn import linear_model, metrics
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split, cross_val_score
-from statsmodels.stats.outliers_influence import variance_inflation_factor
 from sklearn.feature_selection import RFE, SelectKBest, f_regression
 from mlxtend.feature_selection import SequentialFeatureSelector as SFS
-import statsmodels.api as sm
 from scipy import stats
 from math import sqrt
 import warnings
@@ -91,7 +93,7 @@ batting_df = batting_df.reindex(columns = cols)
 
 
 # 2. EDA (Exploratory Data Analysis)
-# 2-1. RS Analysis: How did the league average runs scored change over time?
+# 2-1. RS Analysis: How did the league average runs scored change over time?: One-way ANOVA
 print("------- Team Runs Scored Descriptive Summary -------")
 print(batting_df["RS"].describe())
 
@@ -127,8 +129,79 @@ fig, ax = plt.subplots(figsize = (10, 9))
 
 sns.boxplot(x = "Season", y = "RS", data = batting_df, ax = ax)
 ax.set_xticklabels(ax.get_xticklabels(), rotation = 45)
-ax.set(title = "Yearly Changes in League Average Runs Scored")
+ax.set(title = "Team RS Distribution in each Season")
 plt.show()
+
+# divide seasons into "Era" groups
+def get_era(data):
+    if data["Season"] <= 2006:
+        return "Steroid Era"
+    elif data["Season"] > 2006 and data["Season"] <= 2014:
+        return "Post-steroid Era"
+    else:
+        return "Fly-ball Revolution Era"
+
+batting_df["Era"] = batting_df.apply(lambda x: get_era(x), axis = 1)
+batting_df["Era"] = batting_df["Era"].astype("category")
+
+# check one-way ANOVA assumptions
+# normality
+eras = batting_df["Era"].unique()
+fig = plt.figure(figsize = (12, 12))
+
+for era, i in zip(eras, range(1, 5)):
+    ax = fig.add_subplot(2, 2, i)
+    stats.probplot(batting_df.loc[batting_df["Era"] == era]["RS"], plot = plt)
+    ax.set_title("{}".format(era))
+    ax.set
+fig.suptitle("Team RS QQ Plot in each Era", fontsize = 24, y = 0.95)
+plt.show()
+
+# since Fly-ball Era "RS" are not normally distributed due to 2020 season data,
+# drop 2020 season data (abnormal 60-game season = outliers)
+batting_df = batting_df.loc[batting_df["Season"] != 2020]
+
+# check the normality assumption again
+eras = batting_df["Era"].unique()
+fig = plt.figure(figsize = (12, 12))
+
+for era, i in zip(eras, range(1, 5)):
+    ax = fig.add_subplot(2, 2, i)
+    stats.probplot(batting_df.loc[batting_df["Era"] == era]["RS"], plot = plt)
+    ax.set_title("{}".format(era))
+fig.suptitle("Team RS QQ Plot in each Era without 2020 Season Data", fontsize = 24, y = 0.95)
+plt.show()
+
+# equal-variance assumption
+# descriptive summary
+era_df = batting_df.groupby("Era")
+rs_sum_era = era_df["RS"].describe()
+print(rs_sum_era.to_string())
+
+# box plot
+fig, ax = plt.subplots(figsize = (10, 9))
+
+sns.boxplot(x = "Era", y = "RS", data = batting_df, ax = ax,
+            palette = "BuPu", boxprops = dict(alpha = 0.7))
+ax.set_xticklabels(ax.get_xticklabels())
+ax.set(title = "Team RS Distribution in each Era")
+plt.show()
+
+# one-way ANOVA F-test
+aov = ols("RS ~ C(Era)", data = batting_df).fit()
+aov_table = sm.stats.anova_lm(aov, typ = 2)
+print("------- One-way ANOVA F-test Result -------")
+print(aov_table.round(3))
+# since the p-value is approximately 0,
+# we have significant evidence that is at least one pairwise group mean difference in "RS"
+
+# one-way ANOVA post-hoc test with a Bonferroni correction
+compar = mc.MultiComparison(batting_df['RS'], batting_df['Era'])
+table, a1, a2 = compar.allpairtest(stats.ttest_ind, method = "bonf")
+print("------- One-way ANOVA Post-hoc Test Result -------")
+print(table)
+
+
 
 # 2-2. RS Analysis: In which League (NL vs AL) did teams scored more?: Two-sample t-test
 # group data based on "League" data values
@@ -141,17 +214,6 @@ al_rs = batting_df.loc[batting_df["League"] == "AL"]["RS"]
 
 # check two-sample t-test assumptions
 # check normality
-fig, axes = plt.subplots(1, 2, figsize = (20, 8))
-sns.histplot(nl_rs, kde = True, ax = axes[0], color = "blue")
-sns.histplot(al_rs, kde = True, ax = axes[1], color = "red")
-axes[0].set_title('National League Runs Scored Histogram')
-axes[1].set_title('American League Runs Scored Histogram')
-plt.show()
-
-# since the data is not normally distributed due to 2020 short-season data (low RS = outliers),
-# remove 2020 season data
-batting_df = batting_df.loc[batting_df["Season"] != 2020]
-
 nl_rs = batting_df.loc[batting_df["League"] == "NL"]["RS"]
 al_rs = batting_df.loc[batting_df["League"] == "AL"]["RS"]
 
@@ -429,25 +491,12 @@ plt.grid()
 fig.subplots_adjust(bottom = 0.15)
 plt.show()
 
-# divide seasons into "Era" bins data
-def get_era(data):
-    if data["Season"] <= 2006:
-        return "Steroid Era"
-    elif data["Season"] > 2006 and data["Season"] <= 2014:
-        return "Post-steroid Era"
-    else:
-        return "Fly-ball Revolution Era"
-
-batting_df["Era"] = batting_df.apply(lambda x: get_era(x), axis = 1)
-batting_df["Era"] = batting_df["Era"].astype("category")
+# get different eras
 eras = batting_df["Era"].unique()
 leagues = batting_df["League"].unique()
 
 # start with data of which some features have already been filtered
 # based on pairwise correlations between independent variables above
-# also, concatenate these filtered data and "Era" data from original data
-filtered_df = pd.concat([filtered_df, batting_df["Era"]], axis = 1)
-
 # for each era, find the best two features to build a multiple linear regression model
 for era in eras:
     data = filtered_df.loc[filtered_df["Era"] == era]
@@ -480,4 +529,3 @@ for era in eras:
     vif['VIF'] = [variance_inflation_factor(lm.exog, i) for i in range(lm.exog.shape[1])]
     print("{} VIF".format(era))
     print(vif[vif['Feature'] != 'const'])
-
