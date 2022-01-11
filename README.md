@@ -1,15 +1,18 @@
 # MLB Team Runs Scored Prediction
+<img src="https://techcrunch.com/wp-content/uploads/2016/04/moneyball.png?w=1390&crop=1" />
+(Image source: https://techcrunch.com/2016/04/02/moneyball-is-dead-long-live-moneyball/)
 
 ## Table of Contents
 1. [Motivation](#motivation)
 2. [Metadata](#metadata)
-3. [Data Cleaning](#datacleaning)
-4. EDA (Exploratory Data Analysis)
-5. Feature Scaling
-7. Multiple Linear Regression with Feature Selection
-8. Simple Linear Regression
-9. Model Validation
-10. Conclusion
+3. [Data Cleaning](#data-cleaning)
+5. [EDA (Exploratory Data Analysis)](#eda)
+6. [Feature Selection](#feature-selection)
+7. [Multiple Linear Regression](#mlr)
+8. [Simple Linear Regression](#slr)
+9. [Model Validation](#model-validation)
+10. [Cross-era Comparision](#cross-era-comparision)
+11. [Conclusion](#conclusion)
 
 ## 🤔 Motivation <a name="motivation"></a>
 Before we dive into our analysis, let's briefly talk about the nature of baseball.
@@ -59,7 +62,7 @@ In this project, we'll focus on the first part: **Runs Scored**.
 | **League** | **AL**: American League / **NL**: National League |
 | **TB** | [TB](https://www.mlb.com/glossary/standard-stats/total-bases) |
 
-## 🧹 Data Cleaning <a name="datacleaning"></a>
+## 🧹 Data Cleaning <a name="data-cleaning"></a>
 - Combined 22 different datasets (2000-2021 Season Team Batting Data).
 - Renamed **'R'** data feature as **'RS'** for clarity.
 - Created new data features: **League** and **TB**
@@ -67,27 +70,63 @@ In this project, we'll focus on the first part: **Runs Scored**.
 - Converted **object** data types into **category** data types to save memory usage.
 - Reordered data features.
 
-## 📊 EDA (Exploratory Data Analysis)
+## 📊 EDA (Exploratory Data Analysis) <a name="eda"></a>
+### MLB Team Runs Scored Descriptive Statistics
+| **Count** | **Mean** | **Std** | **Min** | **25%** | **50%** | **75%** | **Max** |
+| :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: |
+| 660 | 719.33 | 125.87 | 219 | 672.75 | 731 | 791 | 978 | </br>
+### Runs Scored Analysis 1: How did the league average runs scored change over time?
+<img src="https://github.com/SanghyunKim1/MLB_Team_RunsScored_Prediction/blob/master/images/barplot.png?raw=true" width="700" height="500">
+
+The bar plot above displays how the **league average runs scored** changed over time since the 2000 season. As we can see, although there were slight fluctuations, teams were able to score relatively many runs on average up until the mid 2000's (2000 ~ 20006). However, such a trend seemed to reverse after the 2006 season. There was a clear downward trend in the league average runs scored for some reason until 2014 season. Then the league average runs scored has been increasing again since 2015 except one weird season: 2020. Note that the 2020 season was an abnormal 60-game season due to the pandemic, while teams play 162 games in a normal season </br>
+So, what happened to teams durig this period? 
+
+```python
+# team batting data: batting_df
+season_df = batting_df.groupby("Season")
+lg_avg_rs = season_df["RS"].mean().round(1).reset_index()
+
+# bar plot
+values = np.array(lg_avg_rs["RS"])
+idx = np.array(lg_avg_rs["Season"])
+c1 = mpatches.Patch(color = "darkred", label = "Steroid Era")
+c2 = mpatches.Patch(color = "lightcoral", label = "Post-steroid Era")
+c3 = mpatches.Patch(color = "red", label = "Fly-ball Revolution Era")
+
+fig, ax = plt.subplots(figsize = (12, 8))
+
+plt.bar(idx, values, edgecolor = "darkgrey", linewidth = 0.6,
+        color = ["darkred"] * 7 + ["lightcoral"] * 8 + ["red"] * 7,
+        alpha = 0.7, zorder = 3)
+plt.xticks(lg_avg_rs["Season"], rotation = 45)
+plt.xlabel("Season")
+plt.ylabel("League Average Runs Scored")
+plt.title("Yearly Changes in League Average Runs Scored", fontsize = 18)
+plt.legend(handles = [c1, c2, c3], ncol = 3,
+           bbox_to_anchor= (0.72, -0.12), loc = "upper center")
+plt.grid(zorder = 0)
+fig.subplots_adjust(bottom = 0.15)
+plt.show()
+```
+
+## Feature Selection <a name="feature-selection"></a>
 
 
-## Feature Selection
+## Multiple Linear Regression <a name="mlr"></a>
 
 
-## Multiple Linear Regression
+## Simple Linear Regression <a name="slr"></a>
 
 
-## Simple Linear Regression
-
-
-## Model Validation
+## Model Validation <a name="model-validation"></a>
 
 
 
-## Cross-era Comparison
+## Cross-era Comparison <a name="cross-era-comparision"></a>
 
 
 
-## Conclusion
+## Conclusion <a name="conclusion"></a>
 
 
 ***5-2. Feature Selection: Filter Method***
