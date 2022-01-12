@@ -8,6 +8,7 @@ import pingouin as pg
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 import statsmodels.stats.multicomp as mc
+from statsmodels.graphics.factorplots import interaction_plot
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from sklearn import linear_model, metrics
 from sklearn.linear_model import LinearRegression
@@ -189,10 +190,10 @@ ax.set_title("Team RS Distribution in each Era", fontsize = 20)
 plt.show()
 
 # one-way ANOVA F-test
-aov = ols("RS ~ C(Era)", data = batting_df).fit()
-aov_table = sm.stats.anova_lm(aov, typ = 1)
+model = ols("RS ~ C(Era)", data = batting_df).fit()
+one_aov_table = sm.stats.anova_lm(model, typ = 1)
 print("------- One-way ANOVA F-test Result -------")
-print(aov_table.round(3))
+print(one_aov_table.round(3))
 # since the p-value is approximately 0,
 # we have significant evidence that is at least one pairwise group mean difference in "RS"
 
@@ -207,6 +208,7 @@ print(table)
 # 2-2. RS Analysis: In which League (NL vs AL) did teams scored more?: Two-sample t-test
 # group data based on "League" data values
 lg_df = batting_df.groupby("League")
+leagues = batting_df["League"].unique()
 print("------- Team Runs Scored Data Descriptive Summary by League -------")
 print(lg_df["RS"].describe())
 
@@ -214,7 +216,7 @@ nl_rs = batting_df.loc[batting_df["League"] == "NL"]["RS"]
 al_rs = batting_df.loc[batting_df["League"] == "AL"]["RS"]
 
 # check two-sample t-test assumptions
-# check normality
+# normality
 nl_rs = batting_df.loc[batting_df["League"] == "NL"]["RS"]
 al_rs = batting_df.loc[batting_df["League"] == "AL"]["RS"]
 
@@ -225,7 +227,7 @@ axes[0].set_title("National League Runs Scored QQ Plot without 2020 Season", fon
 axes[1].set_title("American League Runs Scored QQ Plot without 2020 Season", fontsize = 14)
 plt.show()
 
-# check an equal-variance assumption
+# an equal-variance assumption
 print("NL Runs Scored Variance: {}".format(nl_rs.var()))
 print("AL Runs Scored Variance: {}".format(al_rs.var()))
 
@@ -235,12 +237,12 @@ sns.boxplot(x = "League", y = "RS", data = batting_df, palette = "Set1", boxprop
 ax.set(title = "Runs Scored Distribution by League")
 plt.show()
 
-# Welch's two-sample t-test
-test_result = pg.ttest(al_rs, nl_rs, paired = False, alternative = 'greater', correction = True).round(3)
-print("------- Welch's two-sample t-test result -------")
+# Pooled two-sample t-test
+test_result = pg.ttest(al_rs, nl_rs, paired = False, alternative = 'greater', correction = False).round(3)
+print("------- Pooled two-sample t-test result -------")
 print(test_result.to_string())
-# given the p-value is approximately 0, we reject H0
-# and have a strong evidence that AL teams scored more than NL teams on average
+# given the p-value is approximately 0,
+# we reject H0 and have a strong evidence that AL teams scored more than NL teams on average
 
 # 'RS' histogram and QQ plot
 fig, axes = plt.subplots(1, 2, figsize = (20, 8))
@@ -249,6 +251,34 @@ sns.histplot(batting_df['RS'], kde = True, ax = axes[0], color = "navy")
 axes[0].set_title('Team RS Histogram')
 axes[1] = stats.probplot(batting_df['RS'], plot = plt)
 plt.title('Team RS QQ Plot')
+plt.show()
+
+# 2-3. RS Analysis: Do both "Era" and "League" affect the league average team "RS"?
+# two-factor ANOVA F-test
+# factor 1: "Era" and factor 2: "League"
+model = ols("RS ~ C(Era) + C(League) + C(Era):C(League)", data = batting_df).fit()
+two_aov_table = sm.stats.anova_lm(model, typ = 2)
+print("------- Two-factor ANOVA Table -------")
+print(two_aov_table.round(3))
+
+# interaction plot
+fig = interaction_plot(x = batting_df["League"], trace = batting_df["Era"], response = batting_df["RS"],
+                       colors = ['#4c061d','#d17a22', '#b4c292'])
+plt.title("Interaction Plot")
+plt.ylabel("Mean RS")
+plt.show()
+
+# check ANOVA assumptions
+# normality
+fig = sm.qqplot(model.resid, line = "s")
+plt.title("QQ Plot")
+plt.show()
+
+# equal-variance
+g = sns.FacetGrid(batting_df, col = "Era", row = "League", height = 4, aspect = 1)
+g.map_dataframe(sns.boxplot, y = "RS", data = batting_df,
+                palette = "BuPu", boxprops = dict(alpha = 0.5))
+g.set_axis_labels(y_var = "Team RS", labelpad = -2)
 plt.show()
 
 
