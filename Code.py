@@ -271,7 +271,7 @@ plt.show()
 # check ANOVA assumptions
 # normality
 fig = sm.qqplot(model.resid, line = "s")
-plt.title("QQ Plot")
+plt.title("Two-factor ANOVA QQ Plot")
 plt.show()
 
 # equal-variance
@@ -385,14 +385,14 @@ y_predict = mlr.predict(x_test)
 # scatter plots
 cols = list(mlr_df.drop('RS', axis = 1).columns)
 
-fig, axes = plt.subplots(1, 2, figsize = (16, 10))
+fig, axes = plt.subplots(1, 2, figsize = (20, 10))
 
 for col, ax in zip(cols, axes.flatten()[:2]):
     sns.regplot(x = col, y = 'RS', data = mlr_df, scatter_kws = {'color': 'navy'},
                 line_kws = {'color': 'red'}, ax = ax)
-    ax.set_title('Correlation between {} and RS'.format(col), fontsize = 16)
-    ax.set_xlabel(col)
-    ax.set_ylabel('RS')
+    ax.set_title('Correlation between {} and RS'.format(col), fontsize = 18)
+    ax.set_xlabel(col, fontsize = 14)
+    ax.set_ylabel('RS', fontsize = 14)
 
 plt.show()
 
