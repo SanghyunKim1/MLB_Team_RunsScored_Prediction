@@ -253,7 +253,7 @@ axes[1] = stats.probplot(batting_df['RS'], plot = plt)
 plt.title('Team RS QQ Plot')
 plt.show()
 
-# 2-3. RS Analysis: Do both "Era" and "League" affect the league average team "RS"?
+# 2-3. RS Analysis: Do both "Era" and "League" affect team "RS"?
 # two-factor ANOVA F-test
 # factor 1: "Era" and factor 2: "League"
 model = ols("RS ~ C(Era) + C(League) + C(Era):C(League)", data = batting_df).fit()
@@ -262,9 +262,10 @@ print("------- Two-factor ANOVA Table -------")
 print(two_aov_table.round(3))
 
 # interaction plot
-fig = interaction_plot(x = batting_df["League"], trace = batting_df["Era"], response = batting_df["RS"],
-                       colors = ['#4c061d','#d17a22', '#b4c292'])
-plt.title("Interaction Plot")
+fig, ax = plt.subplots(figsize = (9 ,6))
+interaction_plot(x = batting_df["League"], trace = batting_df["Era"], response = batting_df["RS"],
+                       colors = ['#4c061d','#d17a22', '#b4c292'], ax = ax)
+plt.title("Two-factor ANOVA Interaction Plot", fontsize = 16)
 plt.ylabel("Mean RS")
 plt.show()
 
@@ -284,11 +285,15 @@ plt.show()
 
 
 # 3. Feature Selection
+# initial total number of numerical independent variables (i.e., except the response variable "RS")
+init_var_num = len(batting_df.select_dtypes(exclude = "category").columns)
+print("Initial total number of numerical independent variables: {}".format(init_var_num - 1))
+
 # correlation matrix
 corrMatrix = batting_df.corr()
 fig, ax = plt.subplots(figsize = (8, 8))
 
-sns.heatmap(corrMatrix, square = True, linewidths = 0.3)
+sns.heatmap(corrMatrix, square = True, linewidths = 0.3, vmax = 1, vmin = -1)
 plt.title('Correlation Matrix')
 plt.show()
 
@@ -314,8 +319,8 @@ filtered_df.drop(vars_to_drop, axis = 1, inplace = True)
 # new correlation matrix for filtered data features
 fig, ax = plt.subplots(figsize = (10, 10))
 
-corrMatrix = filtered_df.corr()
-sns.heatmap(corrMatrix, square = True, linewidths = 0.5, annot = True, annot_kws = {'size': 10},
+mask = np.triu(np.ones_like(filtered_df.corr()))
+sns.heatmap(filtered_df.corr(), mask = mask, square = True, linewidths = 0.5, annot = True, annot_kws = {'size': 10},
             xticklabels = corrMatrix.columns, yticklabels = corrMatrix.columns)
 plt.title('Correlation Matrix')
 
@@ -330,7 +335,7 @@ cols = list(x.columns)
 
 model = LinearRegression()
 
-rfe = RFE(estimator = model, n_features_to_select = 2)
+rfe = RFE(estimator = model, n_features_to_select = 2, verbose = 2)
 x_rfe = rfe.fit_transform(x, y)
 model.fit(x_rfe, y)
 
