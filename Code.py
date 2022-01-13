@@ -429,13 +429,12 @@ plt.show()
 # multiple linear regression results
 print('------- Multiple Linear Regression -------')
 print("Intercept: {}".format(mlr.intercept_))
-
 print("Coefficients: {}".format(mlr.coef_))
-
+print("R-squared: {}".format(metrics.r2_score(y_test, y_predict)))
 mse = metrics.mean_squared_error(y_test, y_predict)
 print("RMSE: {}".format(sqrt(mse)))
+print("MAE: {}".format(metrics.mean_absolute_error(y_test, y_predict)))
 
-print("R-squared: {}".format(metrics.r2_score(y_test, y_predict)))
 
 
 
@@ -469,13 +468,11 @@ y_predicted = lm.predict(x_test)
 
 print('------- Simple Linear Regression -------')
 print("Intercept: {}".format(lm.intercept_))
-
 print("Coefficients: {}".format(lm.coef_))
-
+print("R-squared: {}".format(metrics.r2_score(y_test, y_predicted)))
 mse = metrics.mean_squared_error(y_test, y_predicted)
 print("RMSE: {}".format(sqrt(mse)))
-
-print("R-squared: {}".format(metrics.r2_score(y_test, y_predicted)))
+print("MAE: {}".format(metrics.mean_absolute_error(y_test, y_predict)))
 
 
 
