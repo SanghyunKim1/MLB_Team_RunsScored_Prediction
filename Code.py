@@ -95,7 +95,7 @@ batting_df = batting_df.reindex(columns = cols)
 
 # 2. EDA (Exploratory Data Analysis)
 # 2-1. RS Analysis: How did the league average runs scored change over time?: One-way ANOVA
-print("------- Team Runs Scored Descriptive Summary -------")
+print("------- Team Runs Scored Descriptive Statistics -------")
 print(batting_df["RS"].describe())
 
 season_df = batting_df.groupby("Season")
@@ -174,10 +174,10 @@ fig.suptitle("Team RS QQ Plot in each Era without 2020 Season Data", fontsize = 
 plt.show()
 
 # equal-variance
-# descriptive summary
+# descriptive statistics
 era_df = batting_df.groupby("Era")
 rs_sum_era = era_df["RS"].describe()
-print("------- Team Runs Scored Data Descriptive Summary by Era -------")
+print("------- Team Runs Scored Descriptive Statistics by Era -------")
 print(rs_sum_era.to_string())
 
 # box plot
@@ -209,7 +209,7 @@ print(table)
 # group data based on "League" data values
 lg_df = batting_df.groupby("League")
 leagues = batting_df["League"].unique()
-print("------- Team Runs Scored Data Descriptive Summary by League -------")
+print("------- Team Runs Scored Descriptive Statistics by League -------")
 print(lg_df["RS"].describe())
 
 nl_rs = batting_df.loc[batting_df["League"] == "NL"]["RS"]
