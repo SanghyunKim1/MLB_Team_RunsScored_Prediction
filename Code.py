@@ -317,11 +317,13 @@ vars_to_drop = [col for col in upperTri.columns if any(upperTri[col] >= 0.9)]
 filtered_df.drop(vars_to_drop, axis = 1, inplace = True)
 
 # new correlation matrix for filtered data features
-fig, ax = plt.subplots(figsize = (10, 10))
+fig, ax = plt.subplots(figsize = (8, 8))
 
-mask = np.triu(np.ones_like(filtered_df.corr()))
-sns.heatmap(filtered_df.corr(), mask = mask, square = True, linewidths = 0.5, annot = True, annot_kws = {'size': 10},
-            xticklabels = corrMatrix.columns, yticklabels = corrMatrix.columns)
+new_corr = filtered_df.corr()
+mask = np.triu(np.ones_like(new_corr))
+
+sns.heatmap(new_corr, mask = mask, square = True, linewidths = 0.5, annot = True, annot_kws = {'size': 10},
+            xticklabels = new_corr.columns, yticklabels = new_corr.columns)
 plt.title('Correlation Matrix')
 
 plt.show()
@@ -437,9 +439,8 @@ print("MAE: {}".format(metrics.mean_absolute_error(y_test, y_predict)))
 
 
 
-
 # 5. Simple Linear Regression
-# univariate feature selection
+# univariate feature selection (filter method)
 num_df = batting_df.select_dtypes(exclude = "category")
 x = num_df.loc[:, num_df.columns != 'RS']
 y = num_df['RS']
@@ -454,9 +455,8 @@ all_cols = x.columns
 selected_mask = selector.get_support()
 selected_var = all_cols[selected_mask].values
 
-print('Simple Linear Regression Selected Feature: {}'.format(selected_var))
+print('Univariate Feature Selection: {}'.format(selected_var))
 
-# simple linear regression (x:'OPS' / y:'RS')
 x = np.array(batting_df[selected_var]).reshape(-1, 1)
 y = batting_df['RS']
 
@@ -466,7 +466,40 @@ lm = linear_model.LinearRegression().fit(x_train, y_train)
 
 y_predicted = lm.predict(x_test)
 
-print('------- Simple Linear Regression -------')
+print('------- Simple Linear Regression (x = OPS)-------')
+print("Intercept: {}".format(lm.intercept_))
+print("Coefficients: {}".format(lm.coef_))
+print("R-squared: {}".format(metrics.r2_score(y_test, y_predicted)))
+mse = metrics.mean_squared_error(y_test, y_predicted)
+print("RMSE: {}".format(sqrt(mse)))
+print("MAE: {}".format(metrics.mean_absolute_error(y_test, y_predict)))
+
+# recursive feature elimination (wrapper method)
+num_df = batting_df.select_dtypes(exclude = "category")
+x = num_df.loc[:, num_df.columns != 'RS']
+y = num_df['RS']
+cols = list(x.columns)
+
+model = LinearRegression()
+
+rfe = RFE(estimator = model, n_features_to_select = 1)
+x_rfe = rfe.fit_transform(x, y)
+model.fit(x_rfe, y)
+
+temp = pd.Series(rfe.support_, index = cols)
+selected_var = list(temp[temp == True].index)
+print('RFE Feature: {}'.format(selected_var))
+
+x = np.array(batting_df[selected_var]).reshape(-1, 1)
+y = batting_df['RS']
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, random_state = 1)
+
+lm = linear_model.LinearRegression().fit(x_train, y_train)
+
+y_predicted = lm.predict(x_test)
+
+print('------- Simple Linear Regression (x = TB)-------')
 print("Intercept: {}".format(lm.intercept_))
 print("Coefficients: {}".format(lm.coef_))
 print("R-squared: {}".format(metrics.r2_score(y_test, y_predicted)))
@@ -482,26 +515,28 @@ model = LinearRegression()
 x = filtered_df[['OBP', 'ISO']]
 y = filtered_df['RS']
 
-cv_r2 = cross_val_score(model, x, y, scoring = 'r2', cv = 10)
-cv_mse = cross_val_score(model, x, y, scoring = 'neg_mean_squared_error', cv = 10)
-cv_rmse = np.sqrt(-1 * cv_mse)
+cv_r2 = cross_val_score(model, x, y, scoring = "r2", cv = 10)
+cv_rmse = -1 * cross_val_score(model, x, y, scoring = "neg_root_mean_squared_error", cv = 10)
+cv_mae = -1 * cross_val_score(model, x, y, scoring = "neg_mean_absolute_error", cv = 10)
 
-print('------- Multiple Linear Regression Validation -------')
-print('Mean R-squared: {}'.format(cv_r2.mean()))
-print('Mean RMSE: {}'.format(cv_rmse.mean()))
+print("------- Multiple Linear Regression Cross-Validation -------")
+print("Mean R-squared: {}".format(cv_r2.mean()))
+print("Mean RMSE: {}".format(cv_rmse.mean()))
+print("Mean MAE: {}".format(cv_mae.mean()))
 
 # 10-Fold Cross-validation for the simple linear regression model
 model = LinearRegression()
 x = np.array(batting_df['OPS']).reshape(-1, 1)
 y = batting_df['RS']
 
-cv_r2 = cross_val_score(model, x, y, scoring='r2', cv=10)
-cv_mse = cross_val_score(model, x, y, scoring='neg_mean_squared_error', cv=10)
-cv_rmse = np.sqrt(-1 * cv_mse)
+cv_r2 = cross_val_score(model, x, y, scoring = "r2", cv = 10)
+cv_rmse = -1 * cross_val_score(model, x, y, scoring = "neg_root_mean_squared_error", cv = 10)
+cv_mae = -1 * cross_val_score(model, x, y, scoring = "neg_mean_absolute_error", cv = 10)
 
-print('------- Simple Linear Regression Validation -------')
-print('Mean R-squared: {}'.format(cv_r2.mean()))
-print('Mean RMSE: {}'.format(cv_rmse.mean()))
+print("------- Multiple Linear Regression Cross-Validation -------")
+print("Mean R-squared: {}".format(cv_r2.mean()))
+print("Mean RMSE: {}".format(cv_rmse.mean()))
+print("Mean MAE: {}".format(cv_mae.mean()))
 
 
 
