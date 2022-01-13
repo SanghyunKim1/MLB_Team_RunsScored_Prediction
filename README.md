@@ -15,12 +15,12 @@
 11. [Conclusion](#conclusion)
 
 ## 🤔 Motivation <a name="motivation"></a>
-Before we dive into our analysis, let's briefly talk about the nature of baseball.
+Before we dive into my analysis, let's briefly talk about the nature of baseball.
 
 Say you are an owner of a baseball team, then why do you think you are running your team spending billions of dollars per year? 
-Making money, making fans enthusiastic, having fans in ballparks etc... But the ulitmate goal of running a baseball club, as with other sports teams, will be winning. As the owner of your team, your goal should be winning, and thus, you should try to buy wins not just players. This is where **sabermetrics** ([SABR](https://sabr.org) + metrics) has originated. Okay, interesting.
+Making money, making fans enthusiastic, having fans in ballparks and so on... But the ulitmate goal of running a baseball team, as with other sports teams, will be winning. As the owner of your team, your goal should be winning, and thus, you should try to buy wins not just players. This is where **sabermetrics** ([SABR](https://sabr.org) + metrics) has originated. Interesting!
 
-Now we understand that we should focus on wins, then HOW do we win? (i.e. what makes your team win?) As in other sports, a baseball team should score runs and prevent opponents from scoring to win a game at the same time.
+Now we understand that we should focus on wins, then HOW do we win? (i.e. what makes your team win?) As in other sports, a baseball team should score as much as possible while giving up runs as less as possible.
 
 Alright, we're almost there. Your goal is to win, and therefore, your team must outscore your opponents to do so.
 That's the nature of baseball: **Runs Scored** and **Runs Allowed**. </br>
@@ -60,12 +60,13 @@ In this project, we'll focus on the first part: **Runs Scored**.
 | **Newly Created Data** | **Description** |
 | :-----------: | :-----------: |
 | **League** | **AL**: American League / **NL**: National League |
+| **Era** | Era segmentation |
 | **TB** | [TB](https://www.mlb.com/glossary/standard-stats/total-bases) |
 
 ## 🧹 Data Cleaning <a name="data-cleaning"></a>
 - Combined 22 different datasets (2000-2021 Season Team Batting Data).
 - Renamed **'R'** data feature as **'RS'** for clarity.
-- Created new data features: **League** and **TB**
+- Created new data features: **League**, **Era** and **TB**
 - Confirmed that there are no missing duplicated data.
 - Converted **object** data types into **category** data types to save memory usage.
 - Reordered data features.
@@ -78,38 +79,37 @@ In this project, we'll focus on the first part: **Runs Scored**.
 ### Runs Scored Analysis 1: How did the league average runs scored change over time?
 <img src="https://github.com/SanghyunKim1/MLB_Team_RunsScored_Prediction/blob/master/images/barplot.png?raw=true" width="700" height="500">
 
-The bar plot above displays how the **league average runs scored (RS)** changed over time since the 2000 season. As we can see, although there were slight fluctuations, teams were able to score relatively many runs up until the mid 2000's (2000 ~ 2006) on average . </br>
+The bar plot above displays how the **league average runs scored (RS)** changed over time since 2000. As we can see, although there were slight fluctuations, teams were able to score relatively many runs up until the mid 2000's (2000 ~ 2006) on average . </br>
 However, such a trend seemed to reverse after the 2006 season. For some reason, there was a clear downward trend in the league average RS until 2014 season. Then it has been increasing again since 2015 except one weird season: 2020. </br>
 (Note that the 2020 season was an abnormal 60-game season due to the pandemic, while teams usually play 162 games in a normal season.) </br>
-Alright, it *looks* like there are differences in the league mean RS across different eras, but can we do more reliable statistics-based analysis to figure out if such differences are siginificant? Yes: **One-way ANOVA F-test and Post-hoc test**
+Alright, it *looks* like there are differences in the league mean RS across different eras, but can we do a more statistical analysis to figure out if such differences are really *siginificant*? Yes: **One-way ANOVA F-test and Post-hoc test**
 
-```python
-# team batting data: batting_df
-season_df = batting_df.groupby("Season")
-lg_avg_rs = season_df["RS"].mean().round(1).reset_index()
+#### Era segmentation
+For many baseball fans, it's well-known that the MLB history is segmented into several eras based on *Runs Scored environment changes* that correspond with external factors, such as changes in rules/balls, PEDs abuse, etc. Some examples are: </br>
+- MLB players abused PEDs since the mid 1990's up until the mid 2000's.
+- After the drug scandal, MLB's drug testing and penalties became strict to prevent players from being helped by PEDs. 
+- With the help of a new technology, **Statcast**, sabermetricians found that the harder and farther the ball is hit, the better chance hitters have to hit home runs. </br>
 
-# bar plot
-values = np.array(lg_avg_rs["RS"])
-idx = np.array(lg_avg_rs["Season"])
-c1 = mpatches.Patch(color = "darkred", label = "Steroid Era")
-c2 = mpatches.Patch(color = "lightcoral", label = "Post-steroid Era")
-c3 = mpatches.Patch(color = "red", label = "Fly-ball Revolution Era")
+Since the bar plot above captures the reality, I segmented seasons on the basis of the corresponding RS environment observed from the bar plot above. The era segmentation was done as follows:
 
-fig, ax = plt.subplots(figsize = (12, 8))
+| **Season** | 2000-2006 | 2007-2014 | 2014-2021 |
+| :-----------: | :-----------: | :-----------: | :-----------: |
+| **Era** | Steroid Era | Post-steroid Era | Fly-ball Revolution Era |
 
-plt.bar(idx, values, edgecolor = "darkgrey", linewidth = 0.6,
-        color = ["darkred"] * 7 + ["lightcoral"] * 8 + ["red"] * 7,
-        alpha = 0.7, zorder = 3)
-plt.xticks(lg_avg_rs["Season"], rotation = 45)
-plt.xlabel("Season")
-plt.ylabel("League Average Runs Scored")
-plt.title("Yearly Changes in League Average Runs Scored", fontsize = 18)
-plt.legend(handles = [c1, c2, c3], ncol = 3,
-           bbox_to_anchor= (0.72, -0.12), loc = "upper center")
-plt.grid(zorder = 0)
-fig.subplots_adjust(bottom = 0.15)
-plt.show()
-```
+
+#### One-way ANOVA
+
+| **Era** | **Count** | **Mean** | **Std** | **Min** | **25%** | **50%** | **75%** | **Max** |
+| :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: |
+| Steroid Era | 180 | 775.51 | 80.32 | 574 | 718.25 | 768.5 | 826.75 | 978 | 
+| Post-steroid Era | 240 | 714.48 | 79.13 | 513 | 650 | 714.5 | 770 | 968 |
+| Fly-ball Revolution Era | 210 | 733.78 | 75.46 | 573 | 682.75 | 729 | 777.25 | 943 | 
+
+⚠️ From now on, we'll not use the abnormal 60-game 2020 season data, as all teams scored much fewer runs, and hence, it violates normality aassumptions for all analyses I'll be doing.
+
+
+
+
 
 ## Feature Selection <a name="feature-selection"></a>
 
