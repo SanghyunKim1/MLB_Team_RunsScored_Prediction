@@ -385,7 +385,7 @@ y = mlr_df['RS']
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, random_state = 1)
 
 mlr = linear_model.LinearRegression().fit(x_train, y_train)
-y_predict = mlr.predict(x_test)
+y_predicted = mlr.predict(x_test)
 
 # 4-1. Assumption checking
 # linearity
@@ -432,10 +432,10 @@ plt.show()
 print('------- Multiple Linear Regression -------')
 print("Intercept: {}".format(mlr.intercept_))
 print("Coefficients: {}".format(mlr.coef_))
-print("R-squared: {}".format(metrics.r2_score(y_test, y_predict)))
-mse = metrics.mean_squared_error(y_test, y_predict)
+print("R-squared: {}".format(metrics.r2_score(y_test, y_predicted)))
+mse = metrics.mean_squared_error(y_test, y_predicted)
 print("RMSE: {}".format(sqrt(mse)))
-print("MAE: {}".format(metrics.mean_absolute_error(y_test, y_predict)))
+print("MAE: {}".format(metrics.mean_absolute_error(y_test, y_predicted)))
 
 
 
@@ -472,7 +472,7 @@ print("Coefficients: {}".format(lm.coef_))
 print("R-squared: {}".format(metrics.r2_score(y_test, y_predicted)))
 mse = metrics.mean_squared_error(y_test, y_predicted)
 print("RMSE: {}".format(sqrt(mse)))
-print("MAE: {}".format(metrics.mean_absolute_error(y_test, y_predict)))
+print("MAE: {}".format(metrics.mean_absolute_error(y_test, y_predicted)))
 
 # recursive feature elimination (wrapper method)
 num_df = batting_df.select_dtypes(exclude = "category")
@@ -505,7 +505,7 @@ print("Coefficients: {}".format(lm.coef_))
 print("R-squared: {}".format(metrics.r2_score(y_test, y_predicted)))
 mse = metrics.mean_squared_error(y_test, y_predicted)
 print("RMSE: {}".format(sqrt(mse)))
-print("MAE: {}".format(metrics.mean_absolute_error(y_test, y_predict)))
+print("MAE: {}".format(metrics.mean_absolute_error(y_test, y_predicted)))
 
 
 
