@@ -43,7 +43,7 @@ print(batting_df.head().to_string())
 batting_df.rename(columns = {'R': 'RS'}, inplace = True)
 
 # check missing data
-print("Total number of missing values in each column:")
+print("Total number of missing values in each column")
 print(batting_df.isnull().sum())
 
 # check duplicated data
