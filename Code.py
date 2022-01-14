@@ -78,14 +78,15 @@ batting_df["League"] = batting_df.apply(lambda x: get_league(x), axis = 1)
 # check data types
 print(batting_df.dtypes)
 
-# check memory usage
-print("Total Memory Usage Before: {}".format(batting_df.memory_usage(deep = True).sum()))
+# check memory usage before data conversion
+print("Total memory usage before: {}".format(batting_df.memory_usage(deep = True).sum()))
 
 # to save memory usage, change "League" and "Team" data type
 batting_df["Team"] = batting_df["Team"].astype("category")
 batting_df["League"] = batting_df["League"].astype("category")
 
-print("Total Memory Usage After: {}".format(batting_df.memory_usage(deep = True).sum()))
+# check memory usage after data conversion
+print("Total memory usage after: {}".format(batting_df.memory_usage(deep = True).sum()))
 
 # reorder data columns
 cols = ["Season", "League"] + list(batting_df.columns)[1:-1]
