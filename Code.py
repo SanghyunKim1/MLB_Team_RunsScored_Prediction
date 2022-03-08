@@ -25,7 +25,7 @@ matplotlib_axes_logger.setLevel('ERROR')
 # Purpose of Analysis: predicting a team's runs scored based on various team batting statistics
 
 # load datasets
-path = "/Users/sanghyunkim/Desktop/Data Science Project/MLB Analysis/MLB_Team_RunsScored_Prediction/data/"
+path = "/Users/sanghyunkim/Desktop/Data Science Projects/MLB Analysis/MLB_Team_RunsScored_Prediction/data/"
 data_files = sorted([file for file in os.listdir(path)], reverse = True)
 
 # empty dataframe
